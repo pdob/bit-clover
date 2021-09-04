@@ -32,7 +32,7 @@ const DisplayCoinInfo = ({ route }) => {
 
   const [days, setDays] = useState(1);
   const endpoint = `https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`;
-  const chartEndpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30&interval=hourly`;
+  const chartEndpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}&interval=hourly`;
   const [coinData, setCoinData] = useState({});
   const [chartData, setChartData] = useState([]);
   const [isLoading, setLoading] = useState(true);  
@@ -144,13 +144,30 @@ const DisplayCoinInfo = ({ route }) => {
       return `${d}-${m}-${y}, ${h}:00`;
     };
 
+    {/* Component for creating buttons for the chart */}
+
+    const ChartButtons = ({ label }) => {
+      return (
+        <Pressable onPress={() => setDays(label)}>
+          <View style={{
+            backgroundColor: label === days ? 'grey' : 'transparent',
+            borderRadius: 10,
+            padding: 10,
+            opacity: 0.8
+          }}>
+            <Text style={{color: 'white'}}> {label === 1 ? '24H' : `${label}D` } </Text>
+          </View>
+        </Pressable>
+      );
+    }
+
     {/* Get high and low amount + date */}
 
     const ShowHighLow = () => {
       const values = useChartData();
       if (values.greatestY !== undefined || values.smallestY !== undefined) {
         return ( 
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10, paddingRight: 10}}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10, paddingRight: 10, paddingBottom: 10}}>
             <Text style={infoStyles.statsText}>
               Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2})} {'\n'}
               {moment.unix(values.smallestY.x).format('MMMM Do YYYY')} 
@@ -166,6 +183,7 @@ const DisplayCoinInfo = ({ route }) => {
       }
     }
     
+
     {/* Rendering the actual chart and labels + graph styling configuration */}
     return (
       <SafeAreaView style={infoStyles.chart}>
@@ -195,13 +213,28 @@ const DisplayCoinInfo = ({ route }) => {
             format={formatDate}
             style={infoStyles.chartAxisLabels}
           />
+          <View style={{
+            flexDirection: 'row', 
+            justifyContent: 'space-between',
+            paddingLeft: 10,
+            paddingRight: 10
+          }}>
+            {LABELS.map((item, index) => {
+              return (
+                <ChartButtons 
+                  key={index}
+                  label={item}
+                />
+              )
+            })}
+          </View>  
           <Text style={{
             fontSize: 25,
             fontWeight: 'bold',
             paddingLeft: 10,
-
             color: 'white'
-          }}>
+          }}
+          >
             Last {days === 1 ? '24 hours' : `${days} days`} 
           </Text>
           <ShowHighLow />
