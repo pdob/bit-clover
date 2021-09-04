@@ -68,10 +68,12 @@ const styles = StyleSheet.create({
 export const infoStyles = StyleSheet.create({
   chart: {
     backgroundColor: 'black',
-    margin: 10,
-    alignContent: 'center',
-    justifyContent: 'center',
-    paddingBottom: 20
+    justifyContent: 'center'    
+  },
+  chartAxisLabels: {
+    color: 'white',
+    fontSize: 20,
+    textAlign: 'center'
   },
   coinTitle: {
     color: 'white',
@@ -123,7 +125,7 @@ export const infoStyles = StyleSheet.create({
     color: 'white',
     fontSize: 23,
     fontFamily: 'serif',
-    paddingBottom: 5
+    paddingBottom: 5,
   }, 
 
 });

@@ -49,7 +49,7 @@ const Home = () => {
     />
   );
 
-
+  
   return (
     <ScrollView style={styles.container}>
       <Header />
