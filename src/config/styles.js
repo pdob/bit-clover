@@ -7,13 +7,15 @@ const styles = StyleSheet.create({
     fontSize: 15
   },
   flatlistContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    padding: 10,
-    backgroundColor: '#4f5b62',
-    marginLeft: 10,
-    marginRight: 10
-  },  
+    justifyContent: 'space-between',
+    backgroundColor: 'black'
+  },
+  flatlistText: {
+    color: 'white',
+    fontSize: 15,
+    fontFamily: 'serif',
+    paddingLeft: 10
+  },   
   header: {
     backgroundColor: 'black',
     flexDirection: 'row',
@@ -75,6 +77,7 @@ export const infoStyles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center'
   },
+
   coinTitle: {
     color: 'white',
     fontFamily: 'sans-serif',
@@ -118,8 +121,9 @@ export const infoStyles = StyleSheet.create({
   },
   statsText: {
     color: 'white',
+    fontFamily: 'serif',
     fontSize: 15,
-    paddingBottom: 4
+    paddingBottom: 5
   },  
   statsTitle: {
     color: 'white',

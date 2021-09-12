@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ActivityIndicator, 
   Dimensions, 
-  Image, 
+  Pressable,
   SafeAreaView, 
-  Text, 
   ScrollView, 
-  View, 
-  Pressable
+  Text, 
+  View
 } from 'react-native';
 import styles, { infoStyles } from '../config/styles';
 import CoinHeader from '../components/CoinHeader';
@@ -32,91 +31,114 @@ const DisplayCoinInfo = ({ route }) => {
 
   const [days, setDays] = useState(1);
   const endpoint = `https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`;
-  const chartEndpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}&interval=hourly`;
+  const chart1Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1&interval=hourly`;
+  const chart7Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=7&interval=hourly`;
+  const chart14Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=14&interval=hourly`;
+  const chart30Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30&interval=hourly`;
   const [coinData, setCoinData] = useState({});
-  const [chartData, setChartData] = useState([]);
+  const [chartData1, setChartData1] = useState([]);
+  const [chartData7, setChartData7] = useState([]);
+  const [chartData14, setChartData14] = useState([]);
+  const [chartData30, setChartData30] = useState([]);
   const [isLoading, setLoading] = useState(true);  
-  const [selected, setSelected] = useState(false);
-  const [currentPrice, setCurrentPrice] = useState(price);
 
   {/* Function which gets required data sets from the CoinGecko API */}
 
-  const getData = async () => {
-    try {
-      const coinResponse = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json'
-        }
-      });
-      const chartResponse = await fetch(chartEndpoint, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json'
-        }
-      });
+  const getData = () => {
 
-      const coin = await coinResponse.json();
-      const chart = await chartResponse.json();
-      setCoinData(coin.market_data);
-      setChartData(chart.prices);
-
-    }
-    catch (error) {
-      alert(error);
-    } finally {
+    const time = new Date();
+    Promise.all([
+      fetch(endpoint),
+      fetch(chart1Endpoint),
+      fetch(chart7Endpoint), 
+      fetch(chart14Endpoint), 
+      fetch(chart30Endpoint)
+    ])
+    .then(async([res1, res2, res3, res4, res5]) => {
+      const a = await res1.json();
+      const b = await res2.json();
+      const c = await res3.json();
+      const d = await res4.json();
+      const e = await res5.json();
+      setCoinData(a.market_data);
+      setChartData1(b.prices);
+      setChartData7(c.prices);
+      setChartData14(d.prices);
+      setChartData30(e.prices);
+    })
+    .catch(error => {
+      console.log(error);
+    })
+    .finally(() => {
+      const timeTaken = (new Date() - time);
+      console.log(timeTaken);
       setLoading(false);
-    }
+    })
   }
 
   useEffect(() => {
-  getData();
-  }, [days]);
+    getData();
+  }, []);
   
+
   {/* Function which shows the chart for the currency for a selected period of time */}
-
   const ShowChart = () => {
-
 
     {/* Getting the date and required data to display in the chart */}
     const getDate = noOfDays => {
       return moment().subtract(noOfDays, 'days').unix();
     };
     
+    let chartData = [];
+
+    switch(days) {
+      case 1:
+        chartData = chartData1;
+        break;
+      case 7:
+        chartData = chartData7;
+        break;
+      case 14:
+        chartData = chartData14;
+        break;
+      case 30:
+        chartData = chartData30;
+        break;
+    }
+
     const dataToShow = chartData.map((item, index) => {
       return {
-        x: getDate(30) + index  * 3600,
+        x: getDate(days) + index  * 3600,
         y: item[1]
       }
     });
-    
+
     {/* Extracting prices from the Data array, then getting chart labels */}
-    const chartPrices = dataToShow.map(item => item.y);
+    
     
     const getLabelValues = () => {
+      const chartPrices = dataToShow.map(item => item.y);
+      if(chartPrices !== undefined) {
+      let minValue = Math.min(...chartPrices);
+      let maxValue = Math.max(...chartPrices);
+      let midValue = (minValue + maxValue) / 2;
+      let lowerMidValue = (midValue + minValue) / 2;
+      let higherMidValue = (midValue + maxValue) / 2;
 
-        if(chartPrices !== undefined) {
-        let minValue = Math.min(...chartPrices);
-        let maxValue = Math.max(...chartPrices);
-        let midValue = (minValue + maxValue) / 2;
-        let lowerMidValue = (midValue + minValue) / 2;
-        let higherMidValue = (midValue + maxValue) / 2;
-
-        return [
-          numbro(maxValue).formatCurrency( {thousandSeparated: true, mantissa: 2} ),
-          numbro(higherMidValue).formatCurrency( {thousandSeparated: true, mantissa: 2} ),
-          numbro(midValue).formatCurrency( {thousandSeparated: true, mantissa: 2} ),
-          numbro(lowerMidValue).formatCurrency( {thousandSeparated: true, mantissa: 2} ),
-          numbro(minValue).formatCurrency( {thousandSeparated: true, mantissa: 2} )
-        ];
+      return [
+        numbro(maxValue).formatCurrency({ thousandSeparated: true, mantissa: 2 }),
+        numbro(higherMidValue).formatCurrency({ thousandSeparated: true, mantissa: 2 }),
+        numbro(midValue).formatCurrency({thousandSeparated: true, mantissa: 2 }),
+        numbro(lowerMidValue).formatCurrency({ thousandSeparated: true, mantissa: 2 }),
+        numbro(minValue).formatCurrency({ thousandSeparated: true, mantissa: 2 })
+      ];
       } else {
         return [];
       }
     };
 
     {/* Functions required to properly format prices and dates in the chart */}
-
-    const points = monotoneCubicInterpolation({ data: dataToShow, range: 800});   
+    const points = monotoneCubicInterpolation({ data: dataToShow, range: 400 });   
 
     const formatCurrency = value => {
       'worklet';
@@ -155,7 +177,7 @@ const DisplayCoinInfo = ({ route }) => {
             padding: 10,
             opacity: 0.8
           }}>
-            <Text style={{color: 'white'}}> {label === 1 ? '24H' : `${label}D` } </Text>
+            <Text style={{color: 'white'}}>{label}D</Text>
           </View>
         </Pressable>
       );
@@ -165,12 +187,12 @@ const DisplayCoinInfo = ({ route }) => {
 
     const ShowHighLow = () => {
       const values = useChartData();
-      if (values.greatestY !== undefined || values.smallestY !== undefined) {
+      if (values.greatestY !== undefined || values.smallestY !== undefined ) {
         return ( 
           <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10, paddingRight: 10, paddingBottom: 10}}>
             <Text style={infoStyles.statsText}>
               Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2})} {'\n'}
-              {moment.unix(values.smallestY.x).format('MMMM Do YYYY')} 
+              {moment.unix(values.smallestY.x).format(`MMMM Do YYYY` )} 
             </Text>   
             <Text style={infoStyles.statsText}>
               Highest price: {'\n'}{numbro(values.greatestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2})} {'\n'}
@@ -232,6 +254,7 @@ const DisplayCoinInfo = ({ route }) => {
             fontSize: 25,
             fontWeight: 'bold',
             paddingLeft: 10,
+            paddingTop: 10,
             color: 'white'
           }}
           >
@@ -242,7 +265,6 @@ const DisplayCoinInfo = ({ route }) => {
       </SafeAreaView>
     )
   };
-  
 
   return (
     <ScrollView style={styles.container}>
@@ -257,15 +279,16 @@ const DisplayCoinInfo = ({ route }) => {
           {/* Display basic information about selected currency */}
           <View style={infoStyles.coinTitleContainer}>
             <Text style={infoStyles.coinTitle}>{name} current price</Text>
-            <Text style={infoStyles.coinPrice}>{currentPrice} USD</Text>
+            <Text style={infoStyles.coinPrice}>{price} USD</Text>
             <Text style={{color: coinData.price_change_24h_in_currency.usd > 0 ? 'green' : 'red'}}>
-              {coinData.price_change_24h_in_currency.usd > 0 ? '+' : '-'}
-              {coinData.price_change_24h_in_currency.usd.toFixed(3)} USD ({coinData.price_change_percentage_24h.toFixed(3)}%) (last 24h)
+              {coinData.price_change_24h_in_currency.usd > 0 ? '+' : ''}
+              {coinData.price_change_24h_in_currency.usd.toFixed(3)} USD ({coinData.price_change_percentage_24h.toFixed(3)}%)(last 24h)
             </Text>  
           </View>
 
           {/* Chart component */}
           <ShowChart />
+          
 
           {/* Section containing  detailed information about selected currency */}
           <View style={infoStyles.statsContainer}>
@@ -280,9 +303,9 @@ const DisplayCoinInfo = ({ route }) => {
               </Text>
               <Text style={infoStyles.statsText}>
                 {coinData.market_cap_rank} {'\n'}
-                {numbro(coinData.market_cap.usd).formatCurrency({average: true, totalLength: 5})}  {'\n'}
-                {numbro(coinData.circulating_supply).format({average: true, totalLength: 2})} {'\n'}
-                {coinData.total_supply ? numbro(coinData.total_supply).format({average: true, totalLength: 2}) : 'n/a'} {'\n'}
+                {numbro(coinData.market_cap.usd).formatCurrency({average: true, mantissa: 3})}  {'\n'}
+                {numbro(coinData.circulating_supply).format({average: true, mantissa: 3})} {'\n'}
+                {coinData.total_supply ? numbro(coinData.total_supply).format({average: true, mantissa: 3}) : 'n/a'} {'\n'}
                 {coinData.ath.usd} USD       
               </Text>
             </View>
