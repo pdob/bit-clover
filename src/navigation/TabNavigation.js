@@ -1,7 +1,7 @@
 import React from 'react';
 import Home from '../screens/Home';
 import Markets from '../screens/Markets';
-import Portfolio from '../screens/Portfolio';
+import Exchanges from '../screens/Exchanges';
 import Settings from '../screens/Settings';
 import Watchlist from '../screens/Watchlist';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -19,8 +19,9 @@ const TabNavigation = () => {
           height: 50
         },
         tabBarLabelStyle: {
-          fontSize: 8,
+          fontSize: 7,
           fontFamily: 'notoserif',
+          fontWeight: 'bold'
         },
         tabBarContentContainerStyle: {
           alignItems: 'center'
@@ -51,11 +52,11 @@ const TabNavigation = () => {
             />
         }}
       />
-      <Tab.Screen name='Portfolio' component={Portfolio} 
+      <Tab.Screen name='Exchanges' component={Exchanges} 
         options={{
           tabBarIcon: ({ focused }) => 
             <TabBarIcon 
-              iconSrc={icons.portfolio} 
+              iconSrc={icons.exchanges} 
               focused={focused}
             />
         }}

@@ -54,6 +54,26 @@ const styles = StyleSheet.create({
     height: 30,
     width: 150,  
   },
+  marketHeaderBar: {
+    backgroundColor: 'black',
+    width: '100%', 
+    flexDirection: 'row', 
+    height: 35, 
+    justifyContent: 'space-between'
+  },
+  marketHeaderButtons: {
+    backgroundColor: '#263238', 
+    padding: 10, 
+    borderRadius: 10, 
+    justifyContent: 'center',
+    width: 75
+  },
+  marketHeaderButtonText: {
+    color: 'white', 
+    fontSize: 12, 
+    fontWeight: 'bold', 
+    textAlign: 'center'
+  }, 
   sectionTitle: {
     fontSize: 20,
     color: 'white',
