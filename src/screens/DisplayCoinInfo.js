@@ -233,7 +233,7 @@ const DisplayCoinInfo = ({ route }) => {
           />
           <ChartXLabel 
             format={formatDate}
-            style={infoStyles.chartAxisLabels}
+            style={infoStyles.chartAxisLabels} 
           />
           <View style={{
             flexDirection: 'row', 

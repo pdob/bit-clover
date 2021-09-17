@@ -5,7 +5,7 @@ import styles from '../config/styles';
 import { useNavigation } from '@react-navigation/core';
 import numbro from 'numbro';
 
-const endpoint = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d';
+const endpoint = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=80&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d';
 const SIZE = Dimensions.get('window');
 
 const Markets = () => {
@@ -138,7 +138,7 @@ const Markets = () => {
   };
 
 
-  const Item = ({ name, rank, symbol, percentage1h, percentage24h, percentage7d, percentage14d, percentage30d, price, image, sparkline, id }) => {
+  const Item = React.memo(function Item({ name, rank, symbol, percentage1h, percentage24h, percentage7d, percentage14d, percentage30d, price, image, sparkline, id }) {
 
     let percentageShown = [];
 
@@ -164,12 +164,14 @@ const Markets = () => {
       <View style={styles.flatlistContainer}>
         <Pressable 
           style={{flexDirection: 'row', justifyContent: 'space-between'}}
-          onPress={() => navigation.navigate('CoinInfo', {
-            name,
-            image,
-            id,
-            price
-          })
+          onPress={() => {
+              navigation.navigate('CoinInfo', {
+              name,
+              image,
+              id,
+              price
+            })
+          }
         }>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image 
@@ -215,11 +217,12 @@ const Markets = () => {
           </View>
         </Pressable>
       </View>
-    )};
-
-  
+    )});
   
   const renderItem = ({ item }) => {
+    if(item.rank === 9){
+      console.log(item.rank);
+    }
     return (
       <Item 
         id={item.id}

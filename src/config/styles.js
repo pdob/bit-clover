@@ -12,9 +12,9 @@ const styles = StyleSheet.create({
   },
   flatlistText: {
     color: 'white',
-    fontSize: 15,
+    fontSize: 13,
     fontFamily: 'serif',
-    paddingLeft: 10
+    paddingLeft: 8
   },   
   header: {
     backgroundColor: 'black',

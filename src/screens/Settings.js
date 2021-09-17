@@ -1,26 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { Text, View } from 'react-native';
 import styles from '../config/styles';
+import AppHeader from '../components/AppHeader';
+import { ContextProvider } from 'react-is';
 
-let bigG = ' O ';
+
+const SettingsContext = createContext({});
 
 const Settings = () => {
-   
-  const [currency, setCurrency] = useState({
-    currency: 'usd'
-  });
-  bigG = currency.currency;
   
+  const [currency, setCurrency] = useState('usd');
+  const [pushNotificationsActive, setPushNotificationsActive] = useState(false);
+  const [pushNotifcationsInterval, setPushNotifcationsInterval] = useState(24);
+  const [defaultScreen, setDefaultScreen] = useState('Home');
+
+
+  const Ble = () => {
+    return (
+      <SettingsContext.Provider
+        values={{
+          currency,
+          setCurrency
+        }}
+      >
+      </SettingsContext.Provider>
+    )
+  }
+   
   return (
     <View style={styles.container}>
-      <Text>Settings</Text>
+      <AppHeader />
+      <Text>
+        Yoyoyo jebac popo
+      </Text>
     </View>
   );
 };
-console.log(bigG);
 
-export const getBle = () => {
-  return bigG;
-}
+export { SettingsContext };
 
 export default Settings;
