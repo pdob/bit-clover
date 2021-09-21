@@ -1,5 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
+const SIZE = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -83,7 +84,65 @@ const styles = StyleSheet.create({
   separator: {
     height: 0.7,
     width: '100%',
-    backgroundColor: '#263238'
+    backgroundColor: '#1b1b1c'
+  },
+  settingsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'black',
+    borderRadius: 5,
+    justifyContent: 'space-between',
+    height: 53,
+    width: '100%'
+  },  
+  settingsContainer: {
+    backgroundColor: '#263238',
+    flex: 1,
+    padding: 10
+  },
+  settingsHeading: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 25,
+    fontWeight: 'bold',
+    paddingBottom: 10,
+    paddingTop: 10
+  },
+  settingsModal: {
+    backgroundColor: 'black',
+    paddingLeft: 10,
+    paddingRight: 10,
+    height: SIZE.height,
+    opacity: 1
+  },
+  settingsModalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#263238',
+    borderRadius: 5,
+    justifyContent: 'space-between',
+    height: 53,
+    width: '100%'
+  },
+  settingsModalCloseButton: {
+    backgroundColor: '#263238',
+    width: 80,
+    padding: 8,
+    marginLeft: SIZE.width - 100,
+    borderRadius: 10,
+  },  
+  settingsValue: {
+    color: '#b6bab8',
+    fontFamily: 'serif',
+    fontSize: 15,
+    paddingRight: 10
+  },
+  settingsSubheading: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 15,
+    paddingLeft: 10,
+    paddingRight: 10
   }
 });
 
