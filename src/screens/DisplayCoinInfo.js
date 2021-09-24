@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
   ActivityIndicator, 
   Dimensions, 
@@ -21,20 +21,21 @@ import {
 } from '@rainbow-me/animated-charts';
 import moment from 'moment';
 import numbro from 'numbro';
+import { SettingsContext } from '../contexts/SettingsContext';
 
 const DisplayCoinInfo = ({ route }) => {
 
   const SIZE = Dimensions.get('window');
   const LABELS = [1, 7, 14, 30];
-
+  const { currency, currencySymbol } = useContext(SettingsContext);
   const { name, image, id, price } = route.params;
 
   const [days, setDays] = useState(1);
   const endpoint = `https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`;
-  const chart1Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1&interval=hourly`;
-  const chart7Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=7&interval=hourly`;
-  const chart14Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=14&interval=hourly`;
-  const chart30Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30&interval=hourly`;
+  const chart1Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${currency}&days=1&interval=hourly`;
+  const chart7Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${currency}&days=7&interval=hourly`;
+  const chart14Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${currency}&days=14&interval=hourly`;
+  const chart30Endpoint = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${currency}&days=30&interval=hourly`;
   const [coinData, setCoinData] = useState({});
   const [chartData1, setChartData1] = useState([]);
   const [chartData7, setChartData7] = useState([]);
@@ -70,8 +71,6 @@ const DisplayCoinInfo = ({ route }) => {
       console.log(error);
     })
     .finally(() => {
-      const timeTaken = (new Date() - time);
-      console.log(timeTaken);
       setLoading(false);
     })
   }
@@ -126,11 +125,11 @@ const DisplayCoinInfo = ({ route }) => {
       let higherMidValue = (midValue + maxValue) / 2;
 
       return [
-        numbro(maxValue).formatCurrency({ thousandSeparated: true, mantissa: 2 }),
-        numbro(higherMidValue).formatCurrency({ thousandSeparated: true, mantissa: 2 }),
-        numbro(midValue).formatCurrency({thousandSeparated: true, mantissa: 2 }),
-        numbro(lowerMidValue).formatCurrency({ thousandSeparated: true, mantissa: 2 }),
-        numbro(minValue).formatCurrency({ thousandSeparated: true, mantissa: 2 })
+        numbro(maxValue).formatCurrency({ thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol }),
+        numbro(higherMidValue).formatCurrency({ thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol }),
+        numbro(midValue).formatCurrency({thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol }),
+        numbro(lowerMidValue).formatCurrency({ thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol }),
+        numbro(minValue).formatCurrency({ thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol })
       ];
       } else {
         return [];
@@ -147,7 +146,7 @@ const DisplayCoinInfo = ({ route }) => {
         return '';
       }
 
-      return `$${Number(value).toFixed(2)}`;
+      return `${currency === 'USD' ? '$' : currencySymbol}${Number(value).toFixed(2)}`;
     };   
 
     const formatDate = value => {
@@ -171,13 +170,15 @@ const DisplayCoinInfo = ({ route }) => {
     const ChartButtons = ({ label }) => {
       return (
         <Pressable onPress={() => setDays(label)}>
-          <View style={{
-            backgroundColor: label === days ? 'grey' : 'transparent',
-            borderRadius: 10,
-            padding: 10,
-            opacity: 0.8
-          }}>
-            <Text style={{color: 'white'}}>{label}D</Text>
+          <View style={{padding: 15}}>
+            <Text style={{
+              color: label === days ? 'white' : 'grey', 
+              fontWeight: 'bold', 
+              fontSize: 15, 
+              fontFamily: 'sans-serif'}}
+            >
+              {label}D
+            </Text>
           </View>
         </Pressable>
       );
@@ -191,11 +192,11 @@ const DisplayCoinInfo = ({ route }) => {
         return ( 
           <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10, paddingRight: 10, paddingBottom: 10}}>
             <Text style={infoStyles.statsText}>
-              Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2})} {'\n'}
+              Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol})} {'\n'}
               {moment.unix(values.smallestY.x).format(`MMMM Do YYYY` )} 
             </Text>   
             <Text style={infoStyles.statsText}>
-              Highest price: {'\n'}{numbro(values.greatestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2})} {'\n'}
+              Highest price: {'\n'}{numbro(values.greatestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol})} {'\n'}
               {moment.unix(values.greatestY.x).format('MMMM Do YYYY')} 
             </Text>          
           </View>
@@ -216,10 +217,10 @@ const DisplayCoinInfo = ({ route }) => {
                 return (
                   <Text 
                     key={index}
-                    style={{
-                      color: 'white'
-                    }}
-                  >{item}</Text>
+                    style={infoStyles.statsText}
+                  >
+                    {item}
+                  </Text>
                 )
               })
             }
@@ -251,6 +252,7 @@ const DisplayCoinInfo = ({ route }) => {
             })}
           </View>  
           <Text style={{
+            fontFamily: 'serif',
             fontSize: 25,
             fontWeight: 'bold',
             paddingLeft: 10,
@@ -279,10 +281,10 @@ const DisplayCoinInfo = ({ route }) => {
           {/* Display basic information about selected currency */}
           <View style={infoStyles.coinTitleContainer}>
             <Text style={infoStyles.coinTitle}>{name} current price</Text>
-            <Text style={infoStyles.coinPrice}>{price} USD</Text>
-            <Text style={{color: coinData.price_change_24h_in_currency.usd > 0 ? 'green' : 'red'}}>
+            <Text style={infoStyles.coinPrice}>{price.toFixed(2)} {currency}</Text>
+            <Text style={{color: coinData.price_change_24h_in_currency.usd > 0 ? 'green' : 'red', fontSize: 15, fontFamily: 'sans-serif'}}>
               {coinData.price_change_24h_in_currency.usd > 0 ? '+' : ''}
-              {coinData.price_change_24h_in_currency.usd.toFixed(3)} USD ({coinData.price_change_percentage_24h.toFixed(3)}%)(last 24h)
+              {coinData.price_change_24h_in_currency[currency.toLowerCase()].toFixed(3)} {currency} ({coinData.price_change_percentage_24h.toFixed(3)}%)
             </Text>  
           </View>
 
@@ -299,14 +301,16 @@ const DisplayCoinInfo = ({ route }) => {
                 Market cap: {'\n'}             
                 Circulation supply: {'\n'}     
                 Total supply: {'\n'}           
-                All time high: {'\n'}               
+                All time high: {'\n'}
+                All time high date:               
               </Text>
               <Text style={infoStyles.statsText}>
                 {coinData.market_cap_rank} {'\n'}
-                {numbro(coinData.market_cap.usd).formatCurrency({average: true, mantissa: 3})}  {'\n'}
-                {numbro(coinData.circulating_supply).format({average: true, mantissa: 3})} {'\n'}
-                {coinData.total_supply ? numbro(coinData.total_supply).format({average: true, mantissa: 3}) : 'n/a'} {'\n'}
-                {coinData.ath.usd} USD       
+                {numbro(coinData.market_cap[currency.toLowerCase()]).formatCurrency({average: true, mantissa: 3, currencySymbol: currencySymbol})}  {'\n'}
+                {numbro(coinData.circulating_supply).format({average: true, mantissa: 2})} {'\n'}
+                {coinData.total_supply ? numbro(coinData.total_supply).format({average: true, mantissa: 2}) : 'n/a'} {'\n'}
+                {coinData.ath[currency.toLowerCase()].toFixed(2)} {currency} {'\n'}
+                {moment(coinData.ath_date[currency.toLowerCase()]).format('LL')}      
               </Text>
             </View>
           </View>

@@ -5,17 +5,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#263238',
-    fontSize: 15
   },
   flatlistContainer: {
     justifyContent: 'space-between',
-    backgroundColor: 'black'
+    backgroundColor: 'black',
   },
   flatlistText: {
     color: 'white',
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: 'serif',
     paddingLeft: 8
+  },
+  flatlistSubheading: {
+    color: '#b6bab8', 
+    fontWeight: 'bold', 
+    fontSize: 12,
+    fontFamily: 'serif'
   },   
   header: {
     backgroundColor: 'black',
@@ -42,7 +47,7 @@ const styles = StyleSheet.create({
   },
   horizontalFlatListText: {
     fontSize: 15,
-    fontFamily: 'Roboto',
+    fontFamily: 'serif',
     color: 'white'
   },
   indicator: {
@@ -65,7 +70,8 @@ const styles = StyleSheet.create({
   marketHeaderButtons: {
     backgroundColor: '#263238', 
     padding: 10, 
-    borderRadius: 10, 
+    marginLeft: 20,
+    borderRadius: 15, 
     justifyContent: 'center',
     width: 75
   },
@@ -160,7 +166,7 @@ export const infoStyles = StyleSheet.create({
   coinTitle: {
     color: 'white',
     fontFamily: 'sans-serif',
-    fontSize: 15,
+    fontSize: 20
   },
   coinTitleContainer: {
     padding: 10
@@ -200,15 +206,15 @@ export const infoStyles = StyleSheet.create({
   },
   statsText: {
     color: 'white',
-    fontFamily: 'serif',
-    fontSize: 15,
-    paddingBottom: 5
+    fontFamily: 'sans-serif',
+    fontSize: 16,
   },  
   statsTitle: {
     color: 'white',
-    fontSize: 23,
-    fontFamily: 'serif',
-    paddingBottom: 5,
+    fontFamily: 'sans-serif',
+    fontSize: 25,
+    fontWeight: 'bold',
+    paddingBottom: 8,
   }, 
 
 });

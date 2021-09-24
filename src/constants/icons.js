@@ -4,7 +4,7 @@ const icons = {
   markets: require('../assets/icons/markets-icon.png'),
   exchanges: require('../assets/icons/exchanges-icon.png'),
   settings: require('../assets/icons/settings-icon.png'),
-  watchlist: require('../assets/icons/watchlist-icon.png')
+  news: require('../assets/icons/news-icon.png')
 }
 
 export default icons;

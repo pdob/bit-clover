@@ -120,7 +120,7 @@ const Settings = () => {
           setValue={setDefaultScreen}
           visible={toggleDefaultScreen}
           setVisible={setToggleDefaultScreen}
-          options={['Home', 'Markets', 'Exchanges', 'Settings']}
+          options={['Home', 'Markets', 'Exchanges', 'News', 'Settings']}
         />  
 
         <Text style={styles.settingsHeading}>Notifications</Text>

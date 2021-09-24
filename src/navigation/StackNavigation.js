@@ -4,13 +4,17 @@ import TabNavigation from './TabNavigation';
 import DisplayCoinInfo from '../screens/DisplayCoinInfo';
 import PrivacyPolicy from '../screens/PrivacyPolicy';
 import Terms from '../screens/Terms';
+import { SettingsContext } from '../contexts/SettingsContext';
+import { useContext } from 'react';
 
 const Stack = createNativeStackNavigator();
 
 const StackNavigation = () => {
+
+  const { defaultScreen } = useContext(SettingsContext);
+
   return (
     <Stack.Navigator
-      initialRouteName='Root'
       screenOptions={{
         headerStyle: {
           backgroundColor: '#263238'

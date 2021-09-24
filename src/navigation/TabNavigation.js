@@ -3,16 +3,22 @@ import Home from '../screens/Home';
 import Markets from '../screens/Markets';
 import Exchanges from '../screens/Exchanges';
 import Settings from '../screens/Settings';
-import Watchlist from '../screens/Watchlist';
+import News from '../screens/News';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import TabBarIcon from '../components/TabBarIcon';
 import icons from '../constants/icons';
+import { useContext } from 'react';
+import { SettingsContext } from '../contexts/SettingsContext';
 
 const Tab = createMaterialTopTabNavigator();
 
 const TabNavigation = () => {
+
+  const { defaultScreen } = useContext(SettingsContext);
+
   return (
     <Tab.Navigator
+      initialRouteName={defaultScreen}
       screenOptions={{
         tabBarStyle: {
           backgroundColor: '#000000',
@@ -34,7 +40,7 @@ const TabNavigation = () => {
       }}
       tabBarPosition='bottom'
     >
-      <Tab.Screen name='Home' component={Home} 
+      <Tab.Screen name='Home' component={Home} path='Home'
         options={{
         tabBarIcon: ({ focused }) => 
           <TabBarIcon 
@@ -43,7 +49,7 @@ const TabNavigation = () => {
           />
         }}
       />
-      <Tab.Screen name='Markets' component={Markets}
+      <Tab.Screen name='Markets' component={Markets} path='Markets'
         options={{
           tabBarIcon: ({ focused }) => 
             <TabBarIcon 
@@ -61,11 +67,11 @@ const TabNavigation = () => {
             />
         }}
       />
-      <Tab.Screen name='Watchlist' component={Watchlist}
+      <Tab.Screen name='News' component={News}
         options={{
           tabBarIcon: ({ focused }) => 
             <TabBarIcon 
-              iconSrc={icons.watchlist} 
+              iconSrc={icons.news} 
               focused={focused}
             />
         }}

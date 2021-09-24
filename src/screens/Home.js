@@ -1,16 +1,33 @@
-import React from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 import styles from '../config/styles';
-import marketData from '../components/marketData';
 import Header from '../components/AppHeader';
-
-const endpoint = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h';
+import { SettingsContext } from '../contexts/SettingsContext';
 
 const Home = () => {
-  const data = marketData(endpoint);
+  
+  const { currency } = useContext(SettingsContext);
+  const endpoint = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`;
+  
+  const [data, setData] = useState([]);
   const topDailyData = data.slice().sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
   const lossDailyData = data.slice().sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h);
+  const getData = async () => {
+
+    try {
+      const response = await fetch(endpoint);
+      const json = await response.json();
+      setData(json);
+    }
+    catch (error) {
+      alert(error);
+    }
+  }
+
+  useEffect(() => {
+    getData();
+  }, [endpoint]);
 
   const navigation = useNavigation();
 
@@ -32,7 +49,7 @@ const Home = () => {
         <View>
           <Text style={styles.horizontalFlatListText}
             numberOfLines={2}
-          >{price.toFixed(2)} USD</Text>
+          >{price.toFixed(2)} {currency}</Text>
           <Text style={{color: change > 0 ? 'green' : 'red'}}>{change.toFixed(3)}%</Text>
         </View>
       </View>
