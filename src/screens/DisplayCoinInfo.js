@@ -127,11 +127,11 @@ const DisplayCoinInfo = ({ route }) => {
       let higherMidValue = (midValue + maxValue) / 2;
 
       return [
-        numbro(maxValue).formatCurrency({ thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol }),
-        numbro(higherMidValue).formatCurrency({ thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol }),
-        numbro(midValue).formatCurrency({thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol }),
-        numbro(lowerMidValue).formatCurrency({ thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol }),
-        numbro(minValue).formatCurrency({ thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol })
+        numbro(maxValue).formatCurrency({ thousandSeparated: true, mantissa: maxValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
+        numbro(higherMidValue).formatCurrency({ thousandSeparated: true, mantissa: higherMidValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
+        numbro(midValue).formatCurrency({thousandSeparated: true, mantissa: midValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
+        numbro(lowerMidValue).formatCurrency({ thousandSeparated: true, mantissa: lowerMidValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
+        numbro(minValue).formatCurrency({ thousandSeparated: true, mantissa: minValue > 1 ? 2 : 4, currencySymbol: currencySymbol })
       ];
       } else {
         return [];
@@ -148,7 +148,7 @@ const DisplayCoinInfo = ({ route }) => {
         return '';
       }
 
-      return `${currency === 'USD' ? '$' : currencySymbol}${Number(value).toFixed(2)}`;
+      return `${currency === 'USD' ? '$' : currencySymbol}${Number(value).toFixed(value > 1 ? 2 : 4)}`;
     };   
 
     const formatDate = value => {
@@ -172,12 +172,14 @@ const DisplayCoinInfo = ({ route }) => {
     const ChartButtons = ({ label }) => {
       return (
         <Pressable onPress={() => setDays(label)}>
-          <View style={{padding: 15}}>
-            <Text style={{
-              color: label === days ? 'white' : 'grey', 
-              fontWeight: 'bold', 
-              fontSize: 15, 
-              fontFamily: 'sans-serif'}}
+          <View style={{ padding: 15 }}>
+            <Text 
+              style={{
+                color: label === days ? 'white' : 'grey', 
+                fontWeight: 'bold', 
+                fontSize: 16.5, 
+                fontFamily: 'sans-serif'
+              }}
             >
               {label}D
             </Text>
@@ -194,12 +196,22 @@ const DisplayCoinInfo = ({ route }) => {
         return ( 
           <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10, paddingRight: 10, paddingBottom: 10}}>
             <Text style={infoStyles.statsText}>
-              Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol})} {'\n'}
-              {moment.unix(values.smallestY.x).format(`MMMM Do YYYY` )} 
+              Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency({
+                  thousandSeparated: true, 
+                  mantissa: values.smallestY.y > 1 ? 2 : 4, 
+                  currencySymbol: currencySymbol
+                })
+              } {'\n'}
+              {days === 1 ? moment.unix(values.smallestY.x).fromNow() : moment.unix(values.smallestY.x).format(`MMMM Do YYYY`)} 
             </Text>   
             <Text style={infoStyles.statsText}>
-              Highest price: {'\n'}{numbro(values.greatestY.y).formatCurrency( {thousandSeparated: true, mantissa: 2, currencySymbol: currencySymbol})} {'\n'}
-              {moment.unix(values.greatestY.x).format('MMMM Do YYYY')} 
+              Highest price: {'\n'}{numbro(values.greatestY.y).formatCurrency({
+                  thousandSeparated: true, 
+                  mantissa: values.greatestY.y > 1 ? 2 : 4, 
+                  currencySymbol: currencySymbol
+                })
+              } {'\n'}
+              {days === 1 ? moment.unix(values.greatestY.x).fromNow() : moment.unix(values.greatestY.x).format(`MMMM Do YYYY`)} 
             </Text>          
           </View>
         );
@@ -254,15 +266,7 @@ const DisplayCoinInfo = ({ route }) => {
             })}
           </View>  
           <View style={{backgroundColor: '#263238', marginLeft: 10, marginRight: 10, borderRadius: 15}}>
-            <Text style={{
-              fontFamily: 'serif',
-              fontSize: 25,
-              fontWeight: 'bold',
-              paddingLeft: 10,
-              paddingTop: 10,
-              color: 'white'
-            }}
-            >
+            <Text style={infoStyles.coinDateInfoLabel}>
               Last {days === 1 ? '24 hours' : `${days} days`} 
             </Text>
             <ShowHighLow />
@@ -272,8 +276,10 @@ const DisplayCoinInfo = ({ route }) => {
     )
   };
 
-  const CoinStat = ({icon, title, value}) => (
-    <View style={{backgroundColor: 'black', height: 50, flexDirection: 'row', justifyContent: 'space-between'}}>
+  {/** Reusable component to display coin stats */}
+
+  const CoinStat = ({ icon, title, value }) => (
+    <View style={infoStyles.coinStat}>
       <View style={{flexDirection: 'row'}}>
         <Image source={icon} style={{height: 20, width: 20, marginRight: 10}}/>
         <Text style={infoStyles.statsText}>{title}</Text>
@@ -282,6 +288,7 @@ const DisplayCoinInfo = ({ route }) => {
     </View>
   );
 
+  {/** Function required to override default Numbro.js abbreviations */}
   numbro.registerLanguage(
     {
       ...require('numbro/languages/en-GB'),
@@ -338,7 +345,7 @@ const DisplayCoinInfo = ({ route }) => {
             <CoinStat icon={icons.ath} title={'All time high'} 
               value={`${coinData.ath[currency.toLowerCase()].toFixed(2)} ${currency}`}
             />
-            <CoinStat icon={icons.marketRank} title={'All time high date'} 
+            <CoinStat icon={icons.athDate} title={'All time high date'} 
               value={moment(coinData.ath_date[currency.toLowerCase()]).format('LL')}
             />          
           </View>

@@ -194,7 +194,21 @@ export const infoStyles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center'
   },
-
+  coinDateInfoLabel: {
+    fontFamily: 'serif',
+    fontSize: 25,
+    fontWeight: 'bold',
+    paddingBottom: 10,
+    paddingLeft: 10,
+    paddingTop: 10,
+    color: 'white'
+  },
+  coinStat: {
+    backgroundColor: 'black', 
+    flexDirection: 'row', 
+    height: 50, 
+    justifyContent: 'space-between'
+  }, 
   coinTitle: {
     color: 'white',
     fontFamily: 'sans-serif',

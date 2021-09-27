@@ -14,8 +14,8 @@ import * as WebBrowser from 'expo-web-browser';
 import moment from 'moment';
 
 
-const API_KEY = 'Insert your own NewsAPI api Key';
-const endpoint = `https://newsapi.org/v2/everything?q=crypto&language=en&apiKey=${API_KEY}`;
+const API_KEY = '8c3447e10a0d4cf99e2fea66952a8b41';
+const endpoint = `Insert your NewsAPI API Key`;
 
 const News = () => {
 
@@ -46,7 +46,16 @@ const News = () => {
         </View>
         <View style={{flex: 0.8}}>
           <Text style={styles.horizontalFlatListText}>{title}</Text>
-          <Text style={{color: '#b6bab8', fontWeight: 'bold', fontSize: 12, paddingTop: 5}}>{moment(publishedAt).fromNow()}</Text>
+          <Text 
+            style={{
+              color: '#b6bab8', 
+              fontWeight: 'bold', 
+              fontSize: 12, 
+              paddingTop: 5
+            }}
+          >
+            {moment(publishedAt).fromNow()}
+          </Text>
         </View>
       </View>
     </Pressable>
