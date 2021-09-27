@@ -14,8 +14,8 @@ import * as WebBrowser from 'expo-web-browser';
 import moment from 'moment';
 
 
-const API_KEY = '8c3447e10a0d4cf99e2fea66952a8b41';
-const endpoint = `Insert your NewsAPI API Key`;
+const API_KEY = 'Insert Your NewsAPI key here';
+const endpoint = `https://newsapi.org/v2/everything?q=crypto&language=en&apiKey=${API_KEY}`;
 
 const News = () => {
 
