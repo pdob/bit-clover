@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { 
   ActivityIndicator, 
   Dimensions, 
+  Image,
   Pressable,
   SafeAreaView, 
   ScrollView, 
@@ -22,6 +23,7 @@ import {
 import moment from 'moment';
 import numbro from 'numbro';
 import { SettingsContext } from '../contexts/SettingsContext';
+import icons from '../constants/icons';
 
 const DisplayCoinInfo = ({ route }) => {
 
@@ -186,7 +188,7 @@ const DisplayCoinInfo = ({ route }) => {
 
     {/* Get high and low amount + date */}
 
-    const ShowHighLow = () => {
+    const ShowHighLow = useCallback(() => {
       const values = useChartData();
       if (values.greatestY !== undefined || values.smallestY !== undefined ) {
         return ( 
@@ -204,7 +206,7 @@ const DisplayCoinInfo = ({ route }) => {
       } else {
         return <Text></Text>
       }
-    }
+    }, []);
     
 
     {/* Rendering the actual chart and labels + graph styling configuration */}
@@ -251,22 +253,47 @@ const DisplayCoinInfo = ({ route }) => {
               )
             })}
           </View>  
-          <Text style={{
-            fontFamily: 'serif',
-            fontSize: 25,
-            fontWeight: 'bold',
-            paddingLeft: 10,
-            paddingTop: 10,
-            color: 'white'
-          }}
-          >
-            Last {days === 1 ? '24 hours' : `${days} days`} 
-          </Text>
-          <ShowHighLow />
+          <View style={{backgroundColor: '#263238', marginLeft: 10, marginRight: 10, borderRadius: 15}}>
+            <Text style={{
+              fontFamily: 'serif',
+              fontSize: 25,
+              fontWeight: 'bold',
+              paddingLeft: 10,
+              paddingTop: 10,
+              color: 'white'
+            }}
+            >
+              Last {days === 1 ? '24 hours' : `${days} days`} 
+            </Text>
+            <ShowHighLow />
+          </View>
         </ChartPathProvider>
       </SafeAreaView>
     )
   };
+
+  const CoinStat = ({icon, title, value}) => (
+    <View style={{backgroundColor: 'black', height: 50, flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={{flexDirection: 'row'}}>
+        <Image source={icon} style={{height: 20, width: 20, marginRight: 10}}/>
+        <Text style={infoStyles.statsText}>{title}</Text>
+      </View>
+      <Text style={infoStyles.statsText}>{value}</Text>
+    </View>
+  );
+
+  numbro.registerLanguage(
+    {
+      ...require('numbro/languages/en-GB'),
+      abbreviations: {
+        thousand: '',
+        million: ' million',
+        billion: ' billion',
+        trillion: ' trillion'
+      },
+    },
+    true
+  );
 
   return (
     <ScrollView style={styles.container}>
@@ -295,24 +322,25 @@ const DisplayCoinInfo = ({ route }) => {
           {/* Section containing  detailed information about selected currency */}
           <View style={infoStyles.statsContainer}>
             <Text style={infoStyles.statsTitle}>About {name} </Text>
-            <View style={infoStyles.stats}>
-              <Text style={infoStyles.statsText}>
-                Market rank: {'\n'}        
-                Market cap: {'\n'}             
-                Circulation supply: {'\n'}     
-                Total supply: {'\n'}           
-                All time high: {'\n'}
-                All time high date:               
-              </Text>
-              <Text style={infoStyles.statsText}>
-                {coinData.market_cap_rank} {'\n'}
-                {numbro(coinData.market_cap[currency.toLowerCase()]).formatCurrency({average: true, mantissa: 3, currencySymbol: currencySymbol})}  {'\n'}
-                {numbro(coinData.circulating_supply).format({average: true, mantissa: 2})} {'\n'}
-                {coinData.total_supply ? numbro(coinData.total_supply).format({average: true, mantissa: 2}) : 'n/a'} {'\n'}
-                {coinData.ath[currency.toLowerCase()].toFixed(2)} {currency} {'\n'}
-                {moment(coinData.ath_date[currency.toLowerCase()]).format('LL')}      
-              </Text>
-            </View>
+            <CoinStat icon={icons.marketRank} title={'Market rank'} value={coinData.market_cap_rank}/>
+            <CoinStat icon={icons.marketCap} title={'Market cap'} 
+              value={numbro(coinData.market_cap[currency.toLowerCase()]).formatCurrency({
+                average: true, 
+                mantissa: 3, 
+                currencySymbol: currencySymbol})}
+            />
+            <CoinStat icon={icons.circulationSupply} title={'Circulating supply'} 
+              value={numbro(coinData.circulating_supply).format({average: true, mantissa: 2})}
+            />
+            <CoinStat icon={icons.totalSupply} title={'Total supply'} 
+              value={coinData.total_supply ? numbro(coinData.total_supply).format({average: true, mantissa: 2}) : 'n/a'}
+            />
+            <CoinStat icon={icons.ath} title={'All time high'} 
+              value={`${coinData.ath[currency.toLowerCase()].toFixed(2)} ${currency}`}
+            />
+            <CoinStat icon={icons.marketRank} title={'All time high date'} 
+              value={moment(coinData.ath_date[currency.toLowerCase()]).format('LL')}
+            />          
           </View>
         </SafeAreaView>
       )}

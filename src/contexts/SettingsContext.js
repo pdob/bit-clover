@@ -1,10 +1,12 @@
 import React, { useState, createContext } from 'react';
+import { Dimensions } from 'react-native';
 
 
 export const SettingsContext = createContext();
 
 const SettingsContextProvider = (props) => {
 
+  const SIZE = Dimensions.get('window');
   const [currency, setCurrency] = useState('USD');
   const [pushNotificationsActive, setPushNotificationsActive] = useState(false);
   const [pushNotifcationsInterval, setPushNotificationsInterval] = useState('Daily');
@@ -22,7 +24,8 @@ const SettingsContextProvider = (props) => {
         setPushNotificationsInterval,
         defaultScreen,
         setDefaultScreen,
-        currencySymbol       
+        currencySymbol,
+        SIZE       
       }}
     >
       {props.children}

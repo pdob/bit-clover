@@ -1,5 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Text, View, Image, FlatList, Pressable, Dimensions } from 'react-native';
+import React, { 
+  useContext, 
+  useEffect, 
+  useState 
+} from 'react';
+import { 
+  FlatList, 
+  Image, 
+  Pressable, 
+  Text, 
+  View 
+} from 'react-native';
 import styles, { infoStyles } from '../config/styles';
 import numbro from 'numbro';
 import * as WebBrowser from 'expo-web-browser';
@@ -7,12 +17,11 @@ import { SettingsContext } from '../contexts/SettingsContext';
 
 const endpoint = 'https://api.coingecko.com/api/v3/exchanges?per_page=50';
 const btcendpoint = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd%2Ceur%2Cgbp';
-const SIZE = Dimensions.get('window');
 
 const Exchanges = () => {
   const [data, setData] = useState([]);
   const [btcPrice, setBtcPrice] = useState({});
-  const { currency, currencySymbol } = useContext(SettingsContext);
+  const { currency, currencySymbol, SIZE } = useContext(SettingsContext);
   
   const getData = async () => {
     try {
@@ -67,7 +76,13 @@ const Exchanges = () => {
               24h volume: {'\n'}
               <Text style={styles.flatlistSubheading}>
                 BTC: {volume.toFixed(1)}{'\n'}
-                {currency}: {numbro(volume * btcPrice[currency.toLowerCase()]).formatCurrency({ average: true, mantissa: 2, currencySymbol: currencySymbol})}
+                {currency}: {
+                  numbro(volume * btcPrice[currency.toLowerCase()]).formatCurrency({ 
+                    average: true, 
+                    mantissa: 2, 
+                    currencySymbol: currencySymbol
+                  })
+                }
               </Text>
             </Text>
           </View>
@@ -81,8 +96,8 @@ const Exchanges = () => {
       country={item.country}
       image={item.image}
       rank={item.trust_score_rank}
-      title={item.name}
       volume={item.trade_volume_24h_btc}
+      title={item.name}
       url={item.url}
     />
   );

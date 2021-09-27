@@ -1,13 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, FlatList, Image, Pressable } from 'react-native';
+import React, { 
+  useEffect, 
+  useState 
+} from 'react';
+import { 
+  FlatList, 
+  Image, 
+  Pressable, 
+  Text, 
+  View, 
+} from 'react-native';
 import styles from '../config/styles';
 import * as WebBrowser from 'expo-web-browser';
 import moment from 'moment';
 
 
-
-const apiKey = '8c3447e10a0d4cf99e2fea66952a8b41';
-const endpoint = `https://newsapi.org/v2/everything?q=crypto&language=en&apiKey=${apiKey}`;
+const API_KEY = 'Insert your own NewsAPI api Key';
+const endpoint = `https://newsapi.org/v2/everything?q=crypto&language=en&apiKey=${API_KEY}`;
 
 const News = () => {
 
@@ -46,10 +54,10 @@ const News = () => {
 
   const renderItem = ({ item }) => (
     <Item 
-      title={item.title}
       image={item.urlToImage}
-      url={item.url}
       publishedAt={item.publishedAt}
+      title={item.title}
+      url={item.url}
     />
   );
 

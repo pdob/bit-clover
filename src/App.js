@@ -1,4 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { 
+  useCallback, 
+  useEffect, 
+  useState 
+} from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import StackNavigation from './navigation/StackNavigation';

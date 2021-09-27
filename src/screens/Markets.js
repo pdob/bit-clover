@@ -1,20 +1,37 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { ActivityIndicator, FlatList, SafeAreaView, Text, View, Image, Pressable, Modal, Dimensions, TextInput, RefreshControl } from 'react-native';
+import React, {
+  useCallback,
+  useContext, 
+  useEffect,
+  useState 
+} from 'react';
+import { 
+  ActivityIndicator, 
+  Image, 
+  FlatList, 
+  Modal, 
+  Pressable, 
+  RefreshControl,
+  SafeAreaView, 
+  Text,
+  TextInput, 
+  View 
+} from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import styles from '../config/styles';
 import { useNavigation } from '@react-navigation/core';
 import numbro from 'numbro';
 import { SettingsContext } from '../contexts/SettingsContext';
 
-const SIZE = Dimensions.get('window');
 
 const Markets = () => {
   
-  const { currency, currencySymbol } = useContext(SettingsContext);
-  const endpoint = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=80&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d`;
+  {/** Import variables from settings context */}
+  const { currency, currencySymbol, SIZE } = useContext(SettingsContext);
+  const endpoint = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d`;
   const [data, setData] = useState([]);
   const [masterData, setMasterData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  {/** Sort data based on to display sorted data*/}
   const marketCapDesc = masterData.slice().sort((a, b) => a.rank - b.rank);
   const marketCapAsc = masterData.slice().sort((a, b) => b.rank - a.rank);
   const priceAsc = masterData.slice().sort((a, b) => a.price - b.price);
@@ -26,6 +43,8 @@ const Markets = () => {
   const [percentage, setPercentage] = useState(24);
   const [sortBy, setSortBy] = useState('Market Cap High');
   const [searchQuery, setSearchQuery] = useState('');
+
+  {/** Map data to filter out unnecessary data from API to improve performance */}
 
   const getData = async () => {
     try {
@@ -73,23 +92,39 @@ const Markets = () => {
     getData();
   }, [refreshing, endpoint]);
 
+  {/** Reusable component for percentage buttons*/}
+
   const PercentButton = ({ percent, label, onPress }) => (
     <Pressable 
-      style={{padding: 10, backgroundColor: percentage === percent ? 'grey' : '#263238', borderRadius: 10}}
+      style={{
+        backgroundColor: percentage === percent ? 'grey' : '#263238', 
+        borderRadius: 10,
+        padding: 10 
+      }}
       onPress={onPress}
     >
       <Text style={styles.marketHeaderButtonText}>{label}</Text>
     </Pressable>
   );
 
+  {/** Reusable component for sorting buttons */}
+
   const SortButton = ({sortVal, onPress }) => (
     <Pressable 
-      style={{height: 45, padding: 10, backgroundColor: sortBy === sortVal ? 'grey' : '#263238', borderRadius: 15, justifyContent: 'center'}}
+      style={{
+        backgroundColor: sortBy === sortVal ? 'grey' : '#263238',
+        borderRadius: 15, 
+        height: 45, 
+        justifyContent: 'center',
+        padding: 10 
+      }}
       onPress={onPress}
     >
       <Text style={styles.marketHeaderButtonText}>{sortVal}</Text>
     </Pressable>
   );
+
+  {/** Method to filter data for the search functionality */}
 
   const searchFilter = (text) => {
     if (text) {
@@ -106,6 +141,8 @@ const Markets = () => {
     }
   }
 
+  {/** Functions required for refresh control */}
+
   const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   }
@@ -114,6 +151,8 @@ const Markets = () => {
     setRefreshing(true);
     wait(2000).then(() => setRefreshing(false));
   }, []);
+
+  {/** Component which houses buttons for sorting and changing flatlist data being displayed */}
 
   const MarketHeader = () => {
     const [percentageVisible, setPercentageVisible] = useState(false);
@@ -134,7 +173,7 @@ const Markets = () => {
           visible={percentageVisible}
           onRequestClose={() => setPercentageVisible(false)}
         >
-          <View style={{height: 180, width: 80, backgroundColor: '#263238', borderRadius: 10, marginLeft: SIZE.width-75}}>
+          <View style={styles.marketPercentMenu}>
             <PercentButton percent={1} label={'1H'} onPress={() => setPercentage(1)}/>
             <PercentButton percent={24} label={'24H'} onPress={() => setPercentage(24)}/>
             <PercentButton percent={7} label={'7D'} onPress={() => setPercentage(7)}/>
@@ -149,7 +188,7 @@ const Markets = () => {
           visible={sortByVisible}
           onRequestClose={() => setSortByVisible(false)}
         >
-          <View style={{height: 250, width: 80, backgroundColor: '#263238', borderRadius: 10, marginLeft: 20}}>
+          <View style={styles.marketSortMenu}>
             <SortButton sortVal={'Market Cap High'} onPress={() => {
               setData(marketCapDesc);
               setSortBy('Market Cap High');
@@ -180,12 +219,12 @@ const Markets = () => {
     )
   };
 
+  {/** Flatlist item component, utilising react memo to improve performance */}
 
   const Item = React.memo(({ name, rank, symbol, percentage1h, percentage24h, percentage7d, percentage14d, percentage30d, price, image, sparkline, id, currencySymbol }) => {
 
     let percentageShown = [];
-
-    switch(percentage) {
+      switch(percentage) {
       case 1:
         percentageShown = percentage1h;
         break;
@@ -205,6 +244,7 @@ const Markets = () => {
 
     return (
       <View style={styles.flatlistContainer}>
+        {/** Pressable component which will pass parameters to the 'Display Coin Info' page */}
         <Pressable 
           style={{flexDirection: 'row', justifyContent: 'space-between'}}
           onPress={() => {
@@ -256,11 +296,16 @@ const Markets = () => {
               }}
             />
           </View>
-          <View style={{paddingRight: 15, justifyContent: 'center'}}>
+          <View 
+            style={{
+              paddingRight: 15, 
+              justifyContent: 'center'
+            }}
+          >
             <Text 
               style={{
                 color: percentageShown > 0 ? 'green' : 'red',
-                fontFamily: 'notoserif',
+                fontFamily: 'serif',
                 fontSize: 13
               }}
             >
@@ -271,6 +316,7 @@ const Markets = () => {
       </View>
     )});
   
+  {/** Render item method using useCallback hook, which will only re-render if value of percentage changes*/}
 
   const renderItem = useCallback(({ item }) => {
 
@@ -292,6 +338,8 @@ const Markets = () => {
       />
   )}, [percentage]);
 
+  {/** Method to get flatlist item layout to improve flatlist performance */}
+
   const getItemLayout = (data, index) => {
     return {
       length: 75,
@@ -300,32 +348,46 @@ const Markets = () => {
     }
   }
 
+  {/** Separator and List empty components */}
+
   const Separator = () => (
-    <View style={{height: 0.4, color: 'grey'}}></View>
+    <View 
+      style={{
+        height: 0.4, 
+        color: 'grey'
+      }}
+    />
+  
   )
 
   const Empty = () => (
-    <View style={{backgroundColor: 'black', height: SIZE.height, paddingTop: 20}}>
+    <View 
+      style={{
+        backgroundColor: 'black',
+        height: SIZE.height, 
+        paddingTop: 20
+      }}
+    >
       <Text style={styles.flatlistText}>Sorry, we cannot find the item you searched for</Text>
     </View>
   )
 
   return (  
-    <SafeAreaView style={styles.container}> 
+    <SafeAreaView style={styles.flatlistContainer}> 
       {isLoading ? <ActivityIndicator color='grey' size='large'/> : ( 
         <View>
           <MarketHeader />
           <FlatList
+            contentContainerStyle={{paddingBottom: 25}}
             data={data}
-            renderItem={renderItem}
             getItemLayout={getItemLayout}
-            keyExtractor={item => item.id}
-            removeClippedSubviews={true}
-            windowSize={15}
             initialNumToRender={10}
             ItemSeparatorComponent={Separator}
+            keyExtractor={item => item.id}
             ListEmptyComponent={Empty}
-            contentContainerStyle={{paddingBottom: 25}}
+            renderItem={renderItem}
+            removeClippedSubviews={true}
+            windowSize={15}
             refreshControl={
               <RefreshControl 
                 refreshing={refreshing}
@@ -334,23 +396,11 @@ const Markets = () => {
             }
           />
           <TextInput 
-            style={{
-              backgroundColor: '#263238',
-              position: 'absolute',
-              height: 35, 
-              width: 120, 
-              borderRadius: 15, 
-              marginLeft: SIZE.width / 2 - 50,
-              textAlign: 'center',
-              color: 'white',
-              fontFamily: 'sans-serif',
-              fontSize: 12,
-              fontWeight: 'bold'
-            }}
-            value={searchQuery}
             onChangeText={(text) => searchFilter(text)}
             placeholder='Search coins'
             placeholderTextColor='white'
+            style={styles.marketTextInput}
+            value={searchQuery}
           />
         </View>
       )}
