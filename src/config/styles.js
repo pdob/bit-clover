@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   flatlistSubheading: {
     color: '#b6bab8', 
     fontFamily: 'serif',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 'bold' 
   },   
   header: {
@@ -39,6 +39,8 @@ const styles = StyleSheet.create({
     paddingBottom: 5
   },
   horizontalFlatListContainer: {
+    borderWidth: 0.3,
+    borderColor: '#c7c7c7',
     backgroundColor: '#4f5b62',
     borderRadius: 15,
     height: 130,
@@ -191,9 +193,17 @@ export const infoStyles = StyleSheet.create({
   },
   chartAxisLabels: {
     color: 'white',
+    fontFamily: 'serif',
     fontSize: 20,
     textAlign: 'center'
   },
+  chartCoinInfo: {
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    paddingLeft: 10, 
+    paddingRight: 10, 
+    paddingBottom: 10
+  },  
   coinDateInfoLabel: {
     fontFamily: 'serif',
     fontSize: 25,
@@ -243,6 +253,14 @@ export const infoStyles = StyleSheet.create({
     color: 'white',
     fontSize: 20
   },
+  showHighLow: {
+    borderColor: '#c7c7c7',
+    borderRadius: 15,
+    borderWidth: 0.3,
+    backgroundColor: '#263238', 
+    marginLeft: 10, 
+    marginRight: 10
+  },
   stats: {
     flexDirection: 'row',
     justifyContent: 'space-between'
@@ -254,7 +272,7 @@ export const infoStyles = StyleSheet.create({
   statsText: {
     color: 'white',
     fontFamily: 'sans-serif',
-    fontSize: 16
+    fontSize: 18
   },  
   statsTitle: {
     color: 'white',

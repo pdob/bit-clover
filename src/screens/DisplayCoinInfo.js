@@ -47,6 +47,8 @@ const DisplayCoinInfo = ({ route }) => {
 
   {/* Function which gets required data sets from the CoinGecko API */}
 
+  const controller = new AbortController();
+
   const getData = () => {
 
     const time = new Date();
@@ -79,8 +81,13 @@ const DisplayCoinInfo = ({ route }) => {
 
   useEffect(() => {
     getData();
+
+    return () => {
+      controller.abort();
+    }
   }, []);
   
+
 
   {/* Function which shows the chart for the currency for a selected period of time */}
   const ShowChart = () => {
@@ -194,25 +201,34 @@ const DisplayCoinInfo = ({ route }) => {
       const values = useChartData();
       if (values.greatestY !== undefined || values.smallestY !== undefined ) {
         return ( 
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10, paddingRight: 10, paddingBottom: 10}}>
-            <Text style={infoStyles.statsText}>
-              Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency({
-                  thousandSeparated: true, 
-                  mantissa: values.smallestY.y > 1 ? 2 : 4, 
-                  currencySymbol: currencySymbol
-                })
-              } {'\n'}
-              {days === 1 ? moment.unix(values.smallestY.x).fromNow() : moment.unix(values.smallestY.x).format(`MMMM Do YYYY`)} 
-            </Text>   
-            <Text style={infoStyles.statsText}>
-              Highest price: {'\n'}{numbro(values.greatestY.y).formatCurrency({
-                  thousandSeparated: true, 
-                  mantissa: values.greatestY.y > 1 ? 2 : 4, 
-                  currencySymbol: currencySymbol
-                })
-              } {'\n'}
-              {days === 1 ? moment.unix(values.greatestY.x).fromNow() : moment.unix(values.greatestY.x).format(`MMMM Do YYYY`)} 
-            </Text>          
+          <View>
+            <Text style={infoStyles.coinDateInfoLabel}>
+              Last {days === 1 ? '24 hours' : `${days} days`} 
+            </Text>
+            <View style={infoStyles.chartCoinInfo}>
+              <Text style={infoStyles.statsText}>
+                Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency({
+                    thousandSeparated: true, 
+                    mantissa: values.smallestY.y > 1 ? 2 : 4, 
+                    currencySymbol: currencySymbol
+                  })
+                } {'\n'}
+                <Text style={styles.flatlistSubheading}>
+                  {days === 1 ? moment.unix(values.smallestY.x).fromNow() : moment.unix(values.smallestY.x).format(`MMMM Do YYYY`)} 
+                </Text>
+              </Text>   
+              <Text style={infoStyles.statsText}>
+                Highest price: {'\n'}{numbro(values.greatestY.y).formatCurrency({
+                    thousandSeparated: true, 
+                    mantissa: values.greatestY.y > 1 ? 2 : 4, 
+                    currencySymbol: currencySymbol
+                  })
+                } {'\n'}
+                <Text style={styles.flatlistSubheading}>
+                  {days === 1 ? moment.unix(values.greatestY.x).fromNow() : moment.unix(values.greatestY.x).format(`MMMM Do YYYY`)} 
+                </Text>
+              </Text>          
+            </View>
           </View>
         );
       } else {
@@ -265,10 +281,7 @@ const DisplayCoinInfo = ({ route }) => {
               )
             })}
           </View>  
-          <View style={{backgroundColor: '#263238', marginLeft: 10, marginRight: 10, borderRadius: 15}}>
-            <Text style={infoStyles.coinDateInfoLabel}>
-              Last {days === 1 ? '24 hours' : `${days} days`} 
-            </Text>
+          <View style={infoStyles.showHighLow}>
             <ShowHighLow />
           </View>
         </ChartPathProvider>

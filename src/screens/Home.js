@@ -58,7 +58,7 @@ const Home = () => {
       <View style={styles.horizontalFlatListContainer}>
         <View style={{flexDirection: 'row'}}>
           <Image 
-            style={{height: 23, width: 23, marginRight: 5}}
+            style={{height: 21, width: 21, marginRight: 4}}
             source={{uri: image}}
           />
           <Text style={styles.horizontalFlatListTitle}>{name}</Text>

@@ -351,13 +351,7 @@ const Markets = () => {
   {/** Separator and List empty components */}
 
   const Separator = () => (
-    <View 
-      style={{
-        height: 0.4, 
-        color: 'grey'
-      }}
-    />
-  
+    <View style={{backgroundColor: '#263238', height: 0.4}}/> 
   )
 
   const Empty = () => (

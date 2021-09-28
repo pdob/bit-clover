@@ -81,6 +81,8 @@ const Settings = () => {
                   style={{
                     alignItems: 'center',
                     backgroundColor: item === value ? 'grey' : '#263238',
+                    borderRadius: 5,
+                    marginTop: -5,
                     flexDirection: 'row',
                     height: 53,
                     justifyContent: 'space-between',
@@ -101,7 +103,7 @@ const Settings = () => {
                   fontSize: 15, 
                   fontFamily: 'serif', 
                   textAlign: 'center'
-                  }}
+                }}
               >
                 Close
               </Text>

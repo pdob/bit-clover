@@ -103,7 +103,7 @@ const Exchanges = () => {
   );
 
   const Separator = () => (
-    <View style={{height: 0.4, color: 'grey'}} />
+    <View style={{ height: 0.4 }} />
   )
 
   return (
