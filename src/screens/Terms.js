@@ -1,10 +1,9 @@
 import React from 'react';
-import { ScrollView, Text } from "react-native";
-import styles from "../config/styles";
+import { ScrollView, Text, StyleSheet } from "react-native";
 
 const Terms = () => (
   <ScrollView style={styles.container}>
-    <Text style={styles.flatlistText}>
+    <Text style={styles.text}>
     1. The creation, distribution, transmission, public display, or performance, and the accessing, downloading, or copying of your Contributions do not and will not infringe the proprietary rights, including but not limited to the copyright, patent, trademark, trade secret, or moral rights of any third party.
     {'\n'}  
     2. You are the creator and owner of or have the necessary licenses, rights, consents, releases, and permissions to use and to authorize us, the Application, and other users of the Application to use your Contributions in any manner contemplated by the Application and these Terms of Use.
@@ -36,5 +35,18 @@ const Terms = () => (
     </Text>
   </ScrollView>
 );
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#263238',
+  },
+  text: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 14,
+    paddingLeft: 8
+  },
+});
 
 export default Terms;

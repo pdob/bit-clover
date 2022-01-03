@@ -1,12 +1,9 @@
 import React from 'react';
-import { ScrollView, Text } from "react-native";
-import styles from "../config/styles";
-
+import { ScrollView, Text, StyleSheet } from "react-native";
 
 const PrivacyPolicy = () => (
   <ScrollView style={styles.container}>
     <Text style={styles.flatlistText}>
-
 
     1. WHAT INFORMATION DO WE COLLECT?
       Personal information you disclose to us
@@ -48,5 +45,18 @@ const PrivacyPolicy = () => (
     </Text>
   </ScrollView>
 );
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#263238',
+  },
+  text: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 14,
+    paddingLeft: 8
+  },
+});
 
 export default PrivacyPolicy;

@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { 
+  useState, 
+  useEffect, 
+  useContext, 
+  useCallback 
+} from 'react';
 import { 
   ActivityIndicator, 
   Dimensions, 
@@ -6,10 +11,10 @@ import {
   Pressable,
   SafeAreaView, 
   ScrollView, 
+  StyleSheet,
   Text, 
   View
 } from 'react-native';
-import styles, { infoStyles } from '../config/styles';
 import CoinHeader from '../components/CoinHeader';
 import {
   ChartDot,
@@ -81,7 +86,7 @@ const DisplayCoinInfo = ({ route }) => {
 
   useEffect(() => {
     getData();
-
+    
     return () => {
       controller.abort();
     }
@@ -126,27 +131,27 @@ const DisplayCoinInfo = ({ route }) => {
     
     const getLabelValues = () => {
       const chartPrices = dataToShow.map(item => item.y);
-      if(chartPrices !== undefined) {
-      let minValue = Math.min(...chartPrices);
-      let maxValue = Math.max(...chartPrices);
-      let midValue = (minValue + maxValue) / 2;
-      let lowerMidValue = (midValue + minValue) / 2;
-      let higherMidValue = (midValue + maxValue) / 2;
+      if (chartPrices) {
+        let minValue = Math.min(...chartPrices);
+        let maxValue = Math.max(...chartPrices);
+        let midValue = (minValue + maxValue) / 2;
+        let lowerMidValue = (midValue + minValue) / 2;
+        let higherMidValue = (midValue + maxValue) / 2;
 
-      return [
-        numbro(maxValue).formatCurrency({ thousandSeparated: true, mantissa: maxValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
-        numbro(higherMidValue).formatCurrency({ thousandSeparated: true, mantissa: higherMidValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
-        numbro(midValue).formatCurrency({thousandSeparated: true, mantissa: midValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
-        numbro(lowerMidValue).formatCurrency({ thousandSeparated: true, mantissa: lowerMidValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
-        numbro(minValue).formatCurrency({ thousandSeparated: true, mantissa: minValue > 1 ? 2 : 4, currencySymbol: currencySymbol })
-      ];
+        return [
+          numbro(maxValue).formatCurrency({ thousandSeparated: true, mantissa: maxValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
+          numbro(higherMidValue).formatCurrency({ thousandSeparated: true, mantissa: higherMidValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
+          numbro(midValue).formatCurrency({thousandSeparated: true, mantissa: midValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
+          numbro(lowerMidValue).formatCurrency({ thousandSeparated: true, mantissa: lowerMidValue > 1 ? 2 : 4, currencySymbol: currencySymbol }),
+          numbro(minValue).formatCurrency({ thousandSeparated: true, mantissa: minValue > 1 ? 2 : 4, currencySymbol: currencySymbol })
+        ];
       } else {
         return [];
       }
     };
 
     {/* Functions required to properly format prices and dates in the chart */}
-    const points = monotoneCubicInterpolation({ data: dataToShow, range: 400 });   
+    const points = monotoneCubicInterpolation({ data: dataToShow, range: 250 });   
 
     const formatCurrency = value => {
       'worklet';
@@ -199,14 +204,14 @@ const DisplayCoinInfo = ({ route }) => {
 
     const ShowHighLow = useCallback(() => {
       const values = useChartData();
-      if (values.greatestY !== undefined || values.smallestY !== undefined ) {
+      if (values?.greatestY || values?.smallestY) {
         return ( 
           <View>
-            <Text style={infoStyles.coinDateInfoLabel}>
+            <Text style={styles.coinDateInfoLabel}>
               Last {days === 1 ? '24 hours' : `${days} days`} 
             </Text>
-            <View style={infoStyles.chartCoinInfo}>
-              <Text style={infoStyles.statsText}>
+            <View style={styles.chartCoinInfo}>
+              <Text style={styles.statsText}>
                 Lowest price: {'\n'}{numbro(values.smallestY.y).formatCurrency({
                     thousandSeparated: true, 
                     mantissa: values.smallestY.y > 1 ? 2 : 4, 
@@ -217,7 +222,7 @@ const DisplayCoinInfo = ({ route }) => {
                   {days === 1 ? moment.unix(values.smallestY.x).fromNow() : moment.unix(values.smallestY.x).format(`MMMM Do YYYY`)} 
                 </Text>
               </Text>   
-              <Text style={infoStyles.statsText}>
+              <Text style={styles.statsText}>
                 Highest price: {'\n'}{numbro(values.greatestY.y).formatCurrency({
                     thousandSeparated: true, 
                     mantissa: values.greatestY.y > 1 ? 2 : 4, 
@@ -232,22 +237,21 @@ const DisplayCoinInfo = ({ route }) => {
           </View>
         );
       } else {
-        return <Text></Text>
+        return <View style={styles.chartCoinInfo}/>
       }
     }, []);
     
-
     {/* Rendering the actual chart and labels + graph styling configuration */}
     return (
-      <SafeAreaView style={infoStyles.chart}>
+      <SafeAreaView style={styles.chart}>
         <ChartPathProvider data={{ points, smoothingStrategy: 'bezier'}}>
-          <View style={{height: 260, position: 'absolute', justifyContent: 'space-between', top: 5, bottom: 0}}>
+          <View style={styles.chartLabels}>
             {
               getLabelValues().map((item, index) => {
                 return (
                   <Text 
                     key={index}
-                    style={infoStyles.statsText}
+                    style={styles.statsText}
                   >
                     {item}
                   </Text>
@@ -260,18 +264,13 @@ const DisplayCoinInfo = ({ route }) => {
           <View style={styles.separator}/>
           <ChartYLabel 
             format={formatCurrency}
-            style={infoStyles.chartAxisLabels}           
+            style={styles.chartAxisLabels}           
           />
           <ChartXLabel 
             format={formatDate}
-            style={infoStyles.chartAxisLabels} 
+            style={styles.chartAxisLabels} 
           />
-          <View style={{
-            flexDirection: 'row', 
-            justifyContent: 'space-between',
-            paddingLeft: 10,
-            paddingRight: 10
-          }}>
+          <View style={styles.chartButtonContainer} >
             {LABELS.map((item, index) => {
               return (
                 <ChartButtons 
@@ -281,7 +280,7 @@ const DisplayCoinInfo = ({ route }) => {
               )
             })}
           </View>  
-          <View style={infoStyles.showHighLow}>
+          <View style={styles.showHighLow}>
             <ShowHighLow />
           </View>
         </ChartPathProvider>
@@ -292,12 +291,36 @@ const DisplayCoinInfo = ({ route }) => {
   {/** Reusable component to display coin stats */}
 
   const CoinStat = ({ icon, title, value }) => (
-    <View style={infoStyles.coinStat}>
+    <View style={styles.coinStat}>
       <View style={{flexDirection: 'row'}}>
         <Image source={icon} style={{height: 20, width: 20, marginRight: 10}}/>
-        <Text style={infoStyles.statsText}>{title}</Text>
+        <Text style={styles.statsText}>{title}</Text>
       </View>
-      <Text style={infoStyles.statsText}>{value}</Text>
+      <Text style={styles.statsText}>{value}</Text>
+    </View>
+  );
+
+  const StatContainer = () => (
+    <View style={styles.statContainer} >
+      <CoinStat icon={icons.marketRank} title='Market rank' value={coinData.market_cap_rank}/>
+      <CoinStat icon={icons.marketCap} title='Market cap'
+        value={numbro(coinData.market_cap[currency.toLowerCase()]).formatCurrency({
+          average: true, 
+          mantissa: 3, 
+          currencySymbol: currencySymbol})}
+      />
+      <CoinStat icon={icons.circulationSupply} title='Circulating supply'
+        value={numbro(coinData.circulating_supply).format({average: true, mantissa: 2})}
+      />
+      <CoinStat icon={icons.totalSupply} title='Total supply' 
+        value={coinData.total_supply ? numbro(coinData.total_supply).format({average: true, mantissa: 2}) : 'n/a'}
+      />
+      <CoinStat icon={icons.ath} title='All time high' 
+        value={`${coinData.ath[currency.toLowerCase()].toFixed(2)} ${currency}`}
+      />
+      <CoinStat icon={icons.athDate} title='ATH date'
+        value={moment(coinData.ath_date[currency.toLowerCase()]).format('LL')}
+      />          
     </View>
   );
 
@@ -326,9 +349,9 @@ const DisplayCoinInfo = ({ route }) => {
           />
 
           {/* Display basic information about selected currency */}
-          <View style={infoStyles.coinTitleContainer}>
-            <Text style={infoStyles.coinTitle}>{name} current price</Text>
-            <Text style={infoStyles.coinPrice}>{price.toFixed(2)} {currency}</Text>
+          <View style={styles.coinTitleContainer}>
+            <Text style={styles.coinTitle}>{name} current price</Text>
+            <Text style={styles.coinPrice}>{price.toFixed(2)} {currency}</Text>
             <Text style={{color: coinData.price_change_24h_in_currency.usd > 0 ? 'green' : 'red', fontSize: 15, fontFamily: 'sans-serif'}}>
               {coinData.price_change_24h_in_currency.usd > 0 ? '+' : ''}
               {coinData.price_change_24h_in_currency[currency.toLowerCase()].toFixed(3)} {currency} ({coinData.price_change_percentage_24h.toFixed(3)}%)
@@ -337,35 +360,152 @@ const DisplayCoinInfo = ({ route }) => {
 
           {/* Chart component */}
           <ShowChart />
-          
 
           {/* Section containing  detailed information about selected currency */}
-          <View style={infoStyles.statsContainer}>
-            <Text style={infoStyles.statsTitle}>About {name} </Text>
-            <CoinStat icon={icons.marketRank} title={'Market rank'} value={coinData.market_cap_rank}/>
-            <CoinStat icon={icons.marketCap} title={'Market cap'} 
-              value={numbro(coinData.market_cap[currency.toLowerCase()]).formatCurrency({
-                average: true, 
-                mantissa: 3, 
-                currencySymbol: currencySymbol})}
-            />
-            <CoinStat icon={icons.circulationSupply} title={'Circulating supply'} 
-              value={numbro(coinData.circulating_supply).format({average: true, mantissa: 2})}
-            />
-            <CoinStat icon={icons.totalSupply} title={'Total supply'} 
-              value={coinData.total_supply ? numbro(coinData.total_supply).format({average: true, mantissa: 2}) : 'n/a'}
-            />
-            <CoinStat icon={icons.ath} title={'All time high'} 
-              value={`${coinData.ath[currency.toLowerCase()].toFixed(2)} ${currency}`}
-            />
-            <CoinStat icon={icons.athDate} title={'All time high date'} 
-              value={moment(coinData.ath_date[currency.toLowerCase()]).format('LL')}
-            />          
+          <View style={styles.statsSectionContainer}>
+            <Text style={styles.statsTitle}>About {name} </Text>
+            <StatContainer />     
           </View>
         </SafeAreaView>
       )}
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#263238',
+  },
+  chart: {
+    backgroundColor: 'black',
+    justifyContent: 'center'    
+  },
+  chartAxisLabels: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 20,
+    textAlign: 'center'
+  },
+  chartButtonContainer: {
+    flexDirection: 'row', 
+    justifyContent: 'space-between',
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  chartCoinInfo: {
+    alignContent: 'center',
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    paddingLeft: 10, 
+    paddingRight: 10
+  }, 
+  chartLabels: {
+    height: 260, 
+    position: 'absolute', 
+    justifyContent: 'space-between', 
+    top: 5, 
+    bottom: 0
+  }, 
+  coinDateInfoLabel: {
+    fontFamily: 'serif',
+    fontSize: 25,
+    fontWeight: 'bold',
+    paddingLeft: 10,
+    color: 'white'
+  },
+  coinStat: {
+    alignItems: 'center',
+    backgroundColor: '#263238', 
+    flexDirection: 'row', 
+    height: 50, 
+    justifyContent: 'space-between'
+  }, 
+  coinTitle: {
+    color: 'white',
+    fontFamily: 'sans-serif',
+    fontSize: 20
+  },
+  coinTitleContainer: {
+    padding: 10
+  },  
+  coinPrice: {
+    color: 'white',
+    fontFamily: 'sans-serif',
+    fontSize: 35
+  },
+  flatlistSubheading: {
+    color: '#b6bab8', 
+    fontFamily: 'serif',
+    fontSize: 13,
+    fontWeight: 'bold' 
+  },  
+  header: {
+    alignItems: 'center',
+    backgroundColor: 'black',
+    flexDirection: 'row',
+    height: 50,
+  },
+  headerBack: {
+    height: 30,
+    marginLeft: 5,
+    marginRight: 10,
+    width: 30
+  },
+  headerLogo: {
+    height: 30,
+    marginRight: 8,
+    width: 30
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 20
+  },
+  separator: {
+    backgroundColor: '#1b1b1c',
+    height: 0.7,
+    width: '100%'
+  },
+  showHighLow: {
+    justifyContent: 'center',
+    borderColor: '#c7c7c7',
+    borderRadius: 15,
+    borderWidth: 0.6,
+    backgroundColor: '#263238', 
+    height: 120,
+    marginLeft: 10, 
+    marginRight: 10
+  },
+  stats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  statContainer: {
+    backgroundColor: '#263238',
+    borderColor: '#c7c7c7',
+    borderRadius: 15, 
+    borderWidth: 0.6,
+    justifyContent: 'center', 
+    padding: 10
+  },  
+  statsSectionContainer: {
+    backgroundColor: 'black',
+    padding: 10,
+  },
+  statsText: {
+    color: 'white',
+    fontFamily: 'sans-serif',
+    fontSize: 18
+  },  
+  statsTitle: {
+    color: 'white',
+    fontFamily: 'sans-serif',
+    fontSize: 25,
+    fontWeight: 'bold',
+    paddingBottom: 15
+  }, 
+
+});
+
 
 export default DisplayCoinInfo;

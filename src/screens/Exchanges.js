@@ -4,24 +4,29 @@ import React, {
   useState 
 } from 'react';
 import { 
+  Dimensions,
   FlatList, 
   Image, 
-  Pressable, 
+  Pressable,
+  StyleSheet, 
   Text, 
   View 
 } from 'react-native';
-import styles, { infoStyles } from '../config/styles';
 import numbro from 'numbro';
 import * as WebBrowser from 'expo-web-browser';
 import { SettingsContext } from '../contexts/SettingsContext';
+import Separator from '../components/Separator';
 
 const endpoint = 'https://api.coingecko.com/api/v3/exchanges?per_page=50';
 const btcendpoint = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd%2Ceur%2Cgbp';
+const SIZE = Dimensions.get('window');
+
+
 
 const Exchanges = () => {
   const [data, setData] = useState([]);
   const [btcPrice, setBtcPrice] = useState({});
-  const { currency, currencySymbol, SIZE } = useContext(SettingsContext);
+  const { currency, currencySymbol } = useContext(SettingsContext);
   
   const getData = async () => {
     try {
@@ -41,37 +46,27 @@ const Exchanges = () => {
     getData();
   }, []);
 
-  const Item = ({ title, image, rank, volume, url, country}) => {
+  const Item = ({ title, image, rank, volume, url, country }) => {
     return (
       <View style={styles.flatlistContainer}>
         <Pressable 
-          style={{
-            alignItems: 'center',
-            height: 70, 
-            flexDirection: 'row', 
-            justifyContent: 'space-between', 
-            marginRight: 10
-          }}
+          style={styles.flatlistItem}
           onPress={() => WebBrowser.openBrowserAsync(url)}
         >
-          <View style={{width: SIZE.width / 2, flexDirection: 'row'}}>
+          <View style={styles.imageContainer}>
             <Image 
-              style={{
-                height: 25,
-                width: 25,
-                marginRight: 5
-              }}
+              style={styles.image}
               source={{
                 uri: image
               }}
             />
 
-            <Text style={infoStyles.statsText}>{rank}. {title}{'\n'}
+            <Text style={styles.statsText}>{rank}. {title}{'\n'}
               <Text style={styles.flatlistSubheading}>{country}</Text>
             </Text>
             
           </View>
-          <View style={{width: SIZE.width / 3.5}}>
+          <View style={styles.stats}>
             <Text style={styles.flatlistText}>
               24h volume: {'\n'}
               <Text style={styles.flatlistSubheading}>
@@ -102,10 +97,6 @@ const Exchanges = () => {
     />
   );
 
-  const Separator = () => (
-    <View style={{ height: 0.4 }} />
-  )
-
   return (
     <View style={styles.container}>
       <FlatList 
@@ -116,5 +107,53 @@ const Exchanges = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#263238',
+  },
+  flatlistContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  flatlistItem: {
+    alignItems: 'center',
+    height: 70, 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginRight: 10
+  },
+  flatlistText: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 14,
+    paddingLeft: 8
+  },
+  flatlistSubheading: {
+    color: '#b6bab8', 
+    fontFamily: 'serif',
+    fontSize: 13,
+    fontWeight: 'bold' 
+  },
+  image: {
+    height: 25,
+    width: 25,
+    marginRight: 5,
+    marginTop: 5
+  },
+  imageContainer: {
+    width: SIZE.width / 2, 
+    flexDirection: 'row'
+  },
+  stats: {
+    width: SIZE.width / 3.5
+  },
+  statsText: {
+    color: 'white',
+    fontFamily: 'sans-serif',
+    fontSize: 18
+  }   
+});
 
 export default Exchanges;

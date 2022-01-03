@@ -5,28 +5,32 @@ import React, {
   useState 
 } from 'react';
 import { 
-  ActivityIndicator, 
+  ActivityIndicator,
+  Dimensions, 
   Image, 
   FlatList, 
   Modal, 
   Pressable, 
   RefreshControl,
-  SafeAreaView, 
+  SafeAreaView,
+  StyleSheet, 
   Text,
   TextInput, 
   View 
 } from 'react-native';
+import MarketSortButton from '../components/Buttons/MarketSortButton';
+import Separator from '../components/Separator';
 import { LineChart } from 'react-native-chart-kit';
-import styles from '../config/styles';
 import { useNavigation } from '@react-navigation/core';
 import numbro from 'numbro';
 import { SettingsContext } from '../contexts/SettingsContext';
 
+const SIZE = Dimensions.get('window');
 
 const Markets = () => {
   
   {/** Import variables from settings context */}
-  const { currency, currencySymbol, SIZE } = useContext(SettingsContext);
+  const { currency, currencySymbol } = useContext(SettingsContext);
   const endpoint = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d`;
   const [data, setData] = useState([]);
   const [masterData, setMasterData] = useState([]);
@@ -107,23 +111,6 @@ const Markets = () => {
     </Pressable>
   );
 
-  {/** Reusable component for sorting buttons */}
-
-  const SortButton = ({sortVal, onPress }) => (
-    <Pressable 
-      style={{
-        backgroundColor: sortBy === sortVal ? 'grey' : '#263238',
-        borderRadius: 15, 
-        height: 45, 
-        justifyContent: 'center',
-        padding: 10 
-      }}
-      onPress={onPress}
-    >
-      <Text style={styles.marketHeaderButtonText}>{sortVal}</Text>
-    </Pressable>
-  );
-
   {/** Method to filter data for the search functionality */}
 
   const searchFilter = (text) => {
@@ -189,30 +176,52 @@ const Markets = () => {
           onRequestClose={() => setSortByVisible(false)}
         >
           <View style={styles.marketSortMenu}>
-            <SortButton sortVal={'Market Cap High'} onPress={() => {
-              setData(marketCapDesc);
-              setSortBy('Market Cap High');
-            }}/> 
-            <SortButton sortVal={'Market Cap Low'} onPress={() => {
-              setData(marketCapAsc);
-              setSortBy('Market Cap Low');
-            }}/> 
-            <SortButton sortVal={'Price High'} onPress={() => {
-              setData(priceDesc);
-              setSortBy('Price High');
-            }}/> 
-            <SortButton sortVal={'Price Low'} onPress={() => {
-              setData(priceAsc);
-              setSortBy('Price Low');
-            }}/> 
-            <SortButton sortVal={'24H Gain'} onPress={() => {
-              setData(percent24Desc);
-              setSortBy('24H Gain');
-            }}/> 
-            <SortButton sortVal={'24H Loss'} onPress={() => {
-              setData(percent24Asc);
-              setSortBy('24H Loss');
-            }}/> 
+            <MarketSortButton 
+              sortVal={'Market Cap High'} 
+              onPress={() => {
+                setData(marketCapDesc);
+                setSortBy('Market Cap High');
+              }}
+              sortBy={sortBy}
+            /> 
+            <MarketSortButton 
+              sortVal={'Market Cap Low'} 
+              onPress={() => {
+                setData(marketCapAsc);
+                setSortBy('Market Cap Low');
+              }}
+              sortBy={sortBy}
+            /> 
+            <MarketSortButton 
+              sortVal={'Price High'} 
+              onPress={() => {
+                setData(priceDesc);
+                setSortBy('Price High');
+              }}
+              sortBy={sortBy}
+            /> 
+            <MarketSortButton 
+              sortVal={'Price Low'} 
+              onPress={() => {
+                setData(priceAsc);
+                setSortBy('Price Low');
+              }}
+              sortBy={sortBy}
+            /> 
+            <MarketSortButton sortVal={'24H Gain'} 
+              onPress={() => {
+                setData(percent24Desc);
+                setSortBy('24H Gain');
+              }}
+              sortBy={sortBy}
+            /> 
+            <MarketSortButton sortVal={'24H Loss'} 
+              onPress={() => {
+                setData(percent24Asc);
+                setSortBy('24H Loss');
+              }}
+              sortBy={sortBy}
+            /> 
           </View>
         </Modal>
       </View>
@@ -221,24 +230,25 @@ const Markets = () => {
 
   {/** Flatlist item component, utilising react memo to improve performance */}
 
-  const Item = React.memo(({ name, rank, symbol, percentage1h, percentage24h, percentage7d, percentage14d, percentage30d, price, image, sparkline, id, currencySymbol }) => {
+  const Item = React.memo(({ name, rank, symbol, ...props }) => {
 
     let percentageShown = [];
+
       switch(percentage) {
       case 1:
-        percentageShown = percentage1h;
+        percentageShown = props.percentage1h;
         break;
       case 7:
-        percentageShown = percentage7d;
+        percentageShown = props.percentage7d;
         break;
       case 14:
-        percentageShown = percentage14d;
+        percentageShown = props.percentage14d;
         break;
       case 24:
-        percentageShown = percentage24h;
+        percentageShown = props.percentage24h;
         break;
       case 30:
-        percentageShown = percentage30d;
+        percentageShown = props.percentage30d;
         break;
     }
 
@@ -246,26 +256,26 @@ const Markets = () => {
       <View style={styles.flatlistContainer}>
         {/** Pressable component which will pass parameters to the 'Display Coin Info' page */}
         <Pressable 
-          style={{flexDirection: 'row', justifyContent: 'space-between'}}
+          style={styles.flatlistItem}
           onPress={() => {
               navigation.navigate('CoinInfo', {
               name,
-              image,
-              id,
-              price
+              image: props.image,
+              id: props.id,
+              price: props.price
             })
           }
         }>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View style={styles.flatlistSubitem}>
             <Image 
-                style={{height: 20, width: 20}}
-                source={{uri: image}}
+              style={{height: 20, width: 20}}
+              source={{uri: props.image}}
             />
             <Text style={styles.flatlistText}>
               {rank} {name}{'\n'}
-              <Text style={{color: '#b6bab8', fontWeight: 'bold', fontSize: 12}}>{symbol.toUpperCase()}{'\n'}</Text>
-              {currencySymbol}        
-              {numbro(price).format({ thousandSeparated: true, mantissa: 2})}
+              <Text style={styles.currencySymbol}>{symbol.toUpperCase()}{'\n'}</Text>
+              {props.currencySymbol}        
+              {numbro(props.price).format({ thousandSeparated: true, mantissa: 2})}
             </Text>
           </View>
           <View>
@@ -279,14 +289,14 @@ const Markets = () => {
               data={{
                 datasets: [
                   {
-                    data: sparkline
+                    data: props.sparkline
                   }
                 ]
               }}
               width={70}
               height={60}
               chartConfig={{
-                color: () => percentage24h > 0 ? 'green' : 'red',
+                color: () => props.percentage24h > 0 ? 'green' : 'red',
                 strokeWidth: 0.9
               }}
               bezier
@@ -296,12 +306,7 @@ const Markets = () => {
               }}
             />
           </View>
-          <View 
-            style={{
-              paddingRight: 15, 
-              justifyContent: 'center'
-            }}
-          >
+          <View style={styles.itemPercentage}>
             <Text 
               style={{
                 color: percentageShown > 0 ? 'green' : 'red',
@@ -350,19 +355,9 @@ const Markets = () => {
 
   {/** Separator and List empty components */}
 
-  const Separator = () => (
-    <View style={{backgroundColor: '#263238', height: 0.4}}/> 
-  )
-
   const Empty = () => (
-    <View 
-      style={{
-        backgroundColor: 'black',
-        height: SIZE.height, 
-        paddingTop: 20
-      }}
-    >
-      <Text style={styles.flatlistText}>Sorry, we cannot find the item you searched for</Text>
+    <View style={styles.empty}>
+      <Text style={styles.flatlistText}>Sorry, we cannot find the item you searched for.</Text>
     </View>
   )
 
@@ -401,5 +396,89 @@ const Markets = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  currencySymbol: {
+    color: '#b6bab8', 
+    fontWeight: 'bold', 
+    fontSize: 12
+  },
+  empty: { 
+    backgroundColor: 'black',
+    height: SIZE.height, 
+    paddingTop: 20
+  },
+  itemPercentage: {
+    paddingRight: 15, 
+    justifyContent: 'center'
+  },
+  flatlistContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  flatlistText: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 14,
+    paddingLeft: 8
+  },
+  flatlistItem: {
+    flexDirection: 'row', 
+    justifyContent: 'space-between'
+  },
+  flatlistSubitem: {
+    flexDirection: 'row', 
+    alignItems: 'center'
+  },
+  marketHeaderBar: {
+    backgroundColor: 'black',
+    flexDirection: 'row', 
+    height: 35, 
+    justifyContent: 'space-between',
+    width: '100%'
+  },
+  marketHeaderButtons: {
+    backgroundColor: '#263238', 
+    borderRadius: 15, 
+    justifyContent: 'center',
+    marginLeft: 20,
+    padding: 10, 
+    width: 75
+  },
+  marketHeaderButtonText: {
+    color: 'white', 
+    fontSize: 12, 
+    fontWeight: 'bold', 
+    textAlign: 'center'
+  },
+  marketPercentMenu: {
+    backgroundColor: '#263238', 
+    borderRadius: 10, 
+    height: 180, 
+    marginLeft: SIZE.width - 75,
+    width: 80
+  },
+  marketSortMenu: {
+    backgroundColor: '#263238', 
+    borderRadius: 10, 
+    height: 250, 
+    marginLeft: 20,
+    width: 80 
+  },
+  marketTextInput: {
+    backgroundColor: '#263238',
+    borderRadius: 15, 
+    color: 'white',
+    fontFamily: 'sans-serif',
+    fontSize: 12,
+    fontWeight: 'bold',
+    height: 35, 
+    marginLeft: SIZE.width / 2 - 50,
+    position: 'absolute',
+    textAlign: 'center',
+    width: 120 
+  },  
+});
+
 
 export default Markets;

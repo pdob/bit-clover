@@ -1,47 +1,103 @@
 import React, { 
   useContext, 
-  useState 
+  useEffect,
+  useState
 } from 'react';
-import { 
+import {
+  Dimensions, 
   Modal, 
   Pressable, 
-  ScrollView, 
+  ScrollView,
+  StyleSheet, 
   Switch, 
   Text, 
   View, 
 } from 'react-native';
 import * as Linking from 'expo-linking';
-import styles from '../config/styles';
 import AppHeader from '../components/AppHeader';
+import Separator from '../components/Separator';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { useNavigation } from '@react-navigation/core';
+import * as Notifications from 'expo-notifications';
 
-
+const SIZE = Dimensions.get('window');
 
 const Settings = () => {
-
+  
   {/** Import and destructure values and setters from the Settings Context */}
-
+  
   const { 
     currency, 
-    setCurrency, 
-    defaultScreen, 
-    setDefaultScreen, 
+    setCurrency,
+    setCurrencyValue, 
+    defaultScreen,
+    setDefaultScreen,
+    setDefaultScreenValue, 
     pushNotificationsActive, 
-    setPushNotificationsActive, 
-    pushNotifcationsInterval, 
-    setPushNotificationsInterval
+    setPushNotificationsActive,
+    setPushNotificationsActiveValue,
   } = useContext(SettingsContext); 
-
+  
+  const endpoint = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h%2C7d%2C30d`;
   const navigation = useNavigation();
   const [toggleCurrency, setToggleCurrency] = useState(false);
   const [toggleDefaultScreen, setToggleDefaultScreen] = useState(false);
-  const [togglePushInterval, setTogglePushInterval] = useState(false);
+  const [data, setData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+  const topDailyData = data.filter(item => (item.price_change_percentage_24h > 10 || item.price_change_percentage_24h < -10));
 
-  const togglePushNotifications = () => setPushNotificationsActive(!pushNotificationsActive);
+  
+  const getData = async () => {
+    try {
+      const response = await fetch(endpoint);
+      const json = await response.json();
+      setData(json);
+    }
+    catch (error) {
+      alert(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    getData();
+    if(!isLoading && topDailyData.length > 0) {
+      scheduleNotifications(topDailyData[Math.floor(Math.random() * topDailyData.length)]);
+    }
+  }, [pushNotificationsActive, endpoint]);
+
+
+  {/* Set up local push notifications if push notifications are active */}
+  
+  const scheduleNotifications = async (item) => {
+    let noOfNotifications = await Notifications.getAllScheduledNotificationsAsync();
+    if(noOfNotifications.length > 1) {
+      Notifications.cancelAllScheduledNotificationsAsync();
+    }
+    if(pushNotificationsActive){
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Price Alert!',
+          body: `${item.name} is ${item.price_change_percentage_24h > 0 ? 'up' : 'down'}` + 
+          ` ${item.price_change_percentage_24h.toFixed(2)}% in the last 24 hours to ${item.current_price.toFixed(3)} ${currency}`
+        },
+        trigger: {
+          seconds: 60 * Math.floor(Math.random() * 1440),
+          repeats: false,
+        },
+      });  
+    } else {
+      Notifications.cancelAllScheduledNotificationsAsync();
+    }
+  }
+
+  const togglePushNotifications = () => { 
+    setPushNotificationsActive(!pushNotificationsActive);
+    setPushNotificationsActiveValue(!pushNotificationsActive);
+  }
 
   {/** Reusable button component for different settings */}
-
 
   const SettingsButton = ({ title, value, onPress }) => {
     return (
@@ -53,12 +109,11 @@ const Settings = () => {
       </Pressable>
     );
   }
-
-
+  
   {/** Component which maps buttons for selecting options */}
 
 
-  const MenuOptions = ({ value, title, setValue, visible, setVisible, options }) => {
+  const MenuOptions = ({ value, title, setValue, visible, setVisible, options, setAsyncValue }) => {
 
     return (
       <Modal 
@@ -68,53 +123,36 @@ const Settings = () => {
         visible={visible}
       >
         <View style={styles.settingsModal}>
-          <View style={{backgroundColor: 'black', width: '100%'}}>
+          <View style={styles.settingsHeadingContainer}>
             <Text style={styles.settingsHeading}>{title}</Text>
           </View>
           {options.map((item, index) => {
             return (
-              <Pressable key={index} onPress={() => {
-                setValue(item)
-                setVisible(false)  
-              }}>
-                <View 
-                  style={{
-                    alignItems: 'center',
-                    backgroundColor: item === value ? 'grey' : '#263238',
-                    borderRadius: 5,
-                    marginTop: -5,
-                    flexDirection: 'row',
-                    height: 53,
-                    justifyContent: 'space-between',
-                    width: '100%'
-                  }}
-                >
+              <Pressable 
+                key={index} 
+                onPress={() => {
+                  setAsyncValue(item)
+                  setValue(item)
+                  setVisible(false)
+                }}
+              >
+                <View style={[styles.settingsModalOptions, {backgroundColor: item === value ? 'grey' : '#263238'}]}>
                   <Text style={styles.settingsSubheading}>{item}</Text>
                 </View>
-                <View style={styles.separator}/>
+                <Separator />
               </Pressable>
             )
           })}
-          <Pressable onPress={() => setVisible(false)} style={{bottom: 40, position: 'absolute'}}>
-            <View style={styles.settingsModalCloseButton}>
-              <Text 
-                style={{
-                  color: 'white', 
-                  fontSize: 15, 
-                  fontFamily: 'serif', 
-                  textAlign: 'center'
-                }}
-              >
-                Close
-              </Text>
-            </View>
+          <Pressable 
+            onPress={() => setVisible(false)} 
+            style={[styles.settingsModalCloseButton]}
+          >
+            <Text style={styles.closeButtonText}>Close </Text>
           </Pressable>
         </View>
       </Modal>
     );
   }
-  
-  
 
   return (
     <ScrollView style={styles.container}>
@@ -129,13 +167,15 @@ const Settings = () => {
         />
         <MenuOptions 
           options={['USD', 'GBP', 'EUR']}
+          setAsyncValue={setCurrencyValue}
           setValue={setCurrency}
           setVisible={setToggleCurrency}
           title={'Currency'}
           value={currency}
           visible={toggleCurrency}
         />
-        <View style={styles.separator}/>
+
+        <Separator />
         <SettingsButton 
           onPress={() => setToggleDefaultScreen(!toggleDefaultScreen)}
           title={'Default Screen'}
@@ -144,6 +184,7 @@ const Settings = () => {
 
         <MenuOptions 
           options={['Home', 'Markets', 'Exchanges', 'News', 'Settings']}
+          setAsyncValue={setDefaultScreenValue}
           setValue={setDefaultScreen}
           setVisible={setToggleDefaultScreen}
           title={'Default Screen'}
@@ -161,35 +202,116 @@ const Settings = () => {
             value={pushNotificationsActive}
           />
         </View>
-        <View style={styles.separator} />
-        <SettingsButton 
-          onPress={() => setTogglePushInterval(!togglePushInterval)}
-          title={'Push Notification frequency'}
-          value={pushNotifcationsInterval}
-        />
-
-        <MenuOptions 
-          options={['Daily', 'Weekly', 'Monthly']}
-          setValue={setPushNotificationsInterval}
-          setVisible={setTogglePushInterval}
-          title={'Push notification frequency'}
-          value={pushNotifcationsInterval}
-          visible={togglePushInterval}
-        />  
+        <Separator />
 
         <Text style={styles.settingsHeading}>About</Text>
         <SettingsButton title={'Contact Us'} onPress={() => Linking.openURL('mailto: bitcloveruk@gmail.com')}/>
-        <View style={styles.separator}/>
+        <View style={styles.separator} />
         <SettingsButton title={'Privacy Policy'} onPress={() => navigation.navigate('Privacy')} />
         <View style={styles.separator}/>
         <SettingsButton title={'Terms of Use'} onPress={() => navigation.navigate('Terms')}/>
         <View style={styles.separator}/>
         <SettingsButton title={'Rate BitClover'}/>
-        <Text style={{fontSize: 15, color: 'white', paddingTop: 10}}>BitClover for Android v1.0.0</Text>
+        <Text style={styles.versionText}> BitClover for Android v1.1.0</Text>
       </View>
-
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#263238',
+  },
+  closeButtonText: {
+    color: 'white', 
+    fontSize: 15, 
+    fontFamily: 'serif', 
+    textAlign: 'center'
+  },
+  separator: {
+    backgroundColor: '#1b1b1c',
+    height: 0.7,
+    width: '100%'
+  },
+  settingsButton: {
+    alignItems: 'center',
+    backgroundColor: 'black',
+    borderRadius: 4,
+    flexDirection: 'row',
+    height: 53,
+    justifyContent: 'space-between',
+    width: '100%'
+  },  
+  settingsContainer: {
+    flex: 1,
+    backgroundColor: '#263238',
+    padding: 10
+  },
+  settingsHeading: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginTop: SIZE.height > 700 ? 15 : 0,
+    paddingBottom: 10,
+    paddingTop: 10
+  },
+  settingsHeadingContainer: {
+    backgroundColor: 'black', 
+    width: '100%'
+  },
+  settingsModal: {
+    backgroundColor: 'black',
+    height: SIZE.height,
+    opacity: 1,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  settingsModalButton: {
+    alignItems: 'center',
+    backgroundColor: '#263238',
+    borderRadius: 5,
+    flexDirection: 'row',
+    height: 53,
+    justifyContent: 'space-between',
+    width: '100%'
+  },
+  settingsModalCloseButton: {
+    backgroundColor: '#263238',
+    borderRadius: 10,
+    marginLeft: SIZE.width - 85,
+    padding: 8,
+    width: 70,
+    bottom: 40, 
+    position: 'absolute'
+  },
+  settingsModalOptions: {
+    alignItems: 'center',
+    borderRadius: 4,
+    flexDirection: 'row',
+    height: 53,
+    justifyContent: 'space-between',
+    width: '100%'
+  },  
+  settingsValue: {
+    color: '#b6bab8',
+    fontFamily: 'serif',
+    fontSize: 15,
+    paddingRight: 10
+  },
+  settingsSubheading: {
+    color: 'white',
+    fontFamily: 'serif',
+    fontSize: 15,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  versionText: {
+    fontSize: 17, 
+    color: 'white', 
+    paddingTop: 40
+  }
+});
 
 export default Settings;

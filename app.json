@@ -10,6 +10,15 @@
       "resizeMode": "cover",
       "backgroundColor": "#000000"
     },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./src/assets/notification-icon.png",
+          "color": "#000000"
+        }
+      ]
+    ],
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -24,7 +33,15 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.pdob.bitclover"
+      "package": "com.pdob.bitclover",
+      "googleServicesFile": "./src/google-services.json",
+      "useNextNotificationsApi": true,
+      "icon": "./src/assets/notification-icon.png"
+    },
+    "notification": {
+      "icon": "./src/assets/notification-icon.png",
+      "color": "#ffffff",
+      "androidMode": "default"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
