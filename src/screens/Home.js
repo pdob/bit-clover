@@ -5,7 +5,6 @@ import React, {
   useState 
 } from 'react';
 import { 
-  ActivityIndicator,
   Dimensions,
   FlatList, 
   Image, 
@@ -15,19 +14,21 @@ import {
   View, 
   Text 
 } from 'react-native';
-import { useNavigation } from '@react-navigation/core';
 import Header from '../components/AppHeader';
+import Error from '../components/Error';
+import Loading from '../components/Loading';
+import { useNavigation } from '@react-navigation/core';
+import {LinearGradient} from 'expo-linear-gradient';
 import { SettingsContext } from '../contexts/SettingsContext';
+import { makeRequest } from '../api';
 const SIZE = Dimensions.get('window');
 
 const Home = () => {
    
-  const { currency } = useContext(SettingsContext);
-
-  const endpoint = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`;
-  
+  const { currency } = useContext(SettingsContext); 
   const [data, setData] = useState([]);
-  const [isLoading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   
   {/** Sort data based on gains and losses */}
@@ -38,12 +39,14 @@ const Home = () => {
 
   const getData = async () => {
     try {
-      const response = await fetch(endpoint);
-      const json = await response.json();
-      setData(json);
-    }
-    catch (error) {
-      alert(error);
+      makeRequest({
+        path: `/markets?vs_currency=${currency}&order=market_cap_desc&per_page=200&page=1&sparkline=false&price_change_percentage=24h`
+      })
+        .then(response => response.json())
+        .then(json => setData(json));
+      setError(false);
+    } catch (error) {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -51,7 +54,7 @@ const Home = () => {
 
   useEffect(() => {
     getData();
-  }, [endpoint, isLoading]);
+  }, [currency]);
 
   
   const Item = React.memo(({ name, image, price, change, id }) => (
@@ -88,7 +91,6 @@ const Home = () => {
       </View>
     </Pressable>
   ));
-
   
   const renderItem = useCallback(({ item }) => (
     <Item 
@@ -100,41 +102,54 @@ const Home = () => {
     />
   ), [currency]);
 
-  
 
   return (
-    <ScrollView style={styles.container}>
-      <Header />
-      {isLoading ? <ActivityIndicator size='large' color='grey' /> : (
-        <View>
-          <View style={[styles.sectionContainer, {marginTop: SIZE.height > 700 ? 15 : 0}]}>
-            <Text style={styles.sectionTitle}>Most Popular Coins</Text>
-            <FlatList 
-              data={data.slice(0, 20)}
-              renderItem={renderItem}
-              horizontal={true}
-            />
-          </View>
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Top Gainers</Text>
-            <FlatList 
-              data={topDailyData.slice(0, 20)}
-              renderItem={renderItem}
-              horizontal={true}
-            />
-          </View>
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Biggest Losers</Text>
-            <FlatList 
-              data={lossDailyData.slice(0, 20)}
-              renderItem={renderItem}
-              horizontal={true}
-            />
-          </View>
-        </View>
+    <LinearGradient 
+      colors={['#102027','#374851']}
+      style={styles.container}
+    >
+      {loading && !error ? ( 
+        <Loading />
+      ) : (
+        <ScrollView>
+          <Header />
+        
+            <View>
+              {!loading && !error && (
+              <View>
+                <View style={[styles.sectionContainer, {marginTop: SIZE.height > 700 ? 15 : 0}]}>
+                  <Text style={styles.sectionTitle}>Most Popular Coins</Text>
+                  <FlatList 
+                    data={data.slice(0, 20)}
+                    renderItem={renderItem}
+                    horizontal
+                  />
+                </View>
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>Top Gainers</Text>
+                  <FlatList 
+                    data={topDailyData.slice(0, 20)}
+                    renderItem={renderItem}
+                    horizontal
+                  />
+                </View>
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionTitle}>Biggest Losers</Text>
+                  <FlatList 
+                    data={lossDailyData.slice(0, 20)}
+                    renderItem={renderItem}
+                    horizontal
+                  />
+                </View>
+              </View>
+              )}
+              {error && <Error />}
+            </View>
+          
+        </ScrollView>
       )}
-    </ScrollView>
-  );
+    </LinearGradient>
+);
 };
 
 const styles = StyleSheet.create({
@@ -154,20 +169,20 @@ const styles = StyleSheet.create({
   horizontalFlatListTitle: {
     color: 'white',
     fontFamily: 'serif',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 'bold',
-    paddingBottom: 5
+    paddingLeft: 3,
+    flex: 1
   },
   horizontalFlatListContainer: {
-    borderWidth: 0.6,
-    borderColor: '#c7c7c7',
-    backgroundColor: '#4f5b62',
+    backgroundColor: '#495f6b',
     borderRadius: 15,
-    height: 133,
+    height: 130,
     margin: 9,
     overflow: 'hidden',
-    padding: 12,
-    width: 133
+    padding: 10,
+    width: 130,
+    elevation: 15,
   },
   horizontalFlatListText: {
     color: 'white',
@@ -181,7 +196,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: 'white',
     fontFamily: 'sans-serif',
-    fontSize: 20,
+    fontSize: 23,
+    fontStyle: 'italic',
     fontWeight: 'bold',
     padding: 10
   },

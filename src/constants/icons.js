@@ -1,8 +1,8 @@
 const icons = {
-  ath: require('../assets/icons/ath.png'),
+  ath: require('../assets/icons/ath-price.png'),
   athDate: require('../assets/icons/ath-date.png'),
   back: require('../assets/icons/back-icon.png'),
-  circulationSupply: require('../assets/icons/circulation-supply.png'),
+  circulatingSupply: require('../assets/icons/circulating-supply.png'),
   home: require('../assets/icons/home-icon.png'),
   markets: require('../assets/icons/markets-icon.png'),
   exchanges: require('../assets/icons/exchanges-icon.png'),

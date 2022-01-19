@@ -2,7 +2,7 @@
   "expo": {
     "name": "BitClover",
     "slug": "bit-clover",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "splash": {
@@ -36,7 +36,8 @@
       "package": "com.pdob.bitclover",
       "googleServicesFile": "./src/google-services.json",
       "useNextNotificationsApi": true,
-      "icon": "./src/assets/notification-icon.png"
+      "icon": "./src/assets/notification-icon.png",
+      "versionCode": 2
     },
     "notification": {
       "icon": "./src/assets/notification-icon.png",

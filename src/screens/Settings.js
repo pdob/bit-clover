@@ -19,6 +19,8 @@ import Separator from '../components/Separator';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { useNavigation } from '@react-navigation/core';
 import * as Notifications from 'expo-notifications';
+import { LinearGradient } from 'expo-linear-gradient';
+import { makeRequest } from '../api';
 
 const SIZE = Dimensions.get('window');
 
@@ -49,9 +51,9 @@ const Settings = () => {
   
   const getData = async () => {
     try {
-      const response = await fetch(endpoint);
-      const json = await response.json();
-      setData(json);
+      makeRequest({path: `/markets?vs_currency=${currency}&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h%2C7d%2C30d`})
+      .then(response => response.json())
+      .then(json => setData(json))
     }
     catch (error) {
       alert(error);
@@ -155,66 +157,71 @@ const Settings = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <AppHeader />
-      <View style={styles.settingsContainer}>
+    <LinearGradient 
+      colors={['#102027','#374851']}
+      style={styles.container}
+    >
+      <ScrollView >
+        <AppHeader />
+        <View style={styles.settingsContainer}>
 
-        <Text style={styles.settingsHeading}>General</Text>
-        <SettingsButton 
-          onPress={() => setToggleCurrency(!toggleCurrency)}
-          title={'Currency'}
-          value={currency.toUpperCase()}
-        />
-        <MenuOptions 
-          options={['USD', 'GBP', 'EUR']}
-          setAsyncValue={setCurrencyValue}
-          setValue={setCurrency}
-          setVisible={setToggleCurrency}
-          title={'Currency'}
-          value={currency}
-          visible={toggleCurrency}
-        />
-
-        <Separator />
-        <SettingsButton 
-          onPress={() => setToggleDefaultScreen(!toggleDefaultScreen)}
-          title={'Default Screen'}
-          value={defaultScreen}
-        />
-
-        <MenuOptions 
-          options={['Home', 'Markets', 'Exchanges', 'News', 'Settings']}
-          setAsyncValue={setDefaultScreenValue}
-          setValue={setDefaultScreen}
-          setVisible={setToggleDefaultScreen}
-          title={'Default Screen'}
-          value={defaultScreen}
-          visible={toggleDefaultScreen}
-        />  
-
-        <Text style={styles.settingsHeading}>Notifications</Text>
-        <View style={styles.settingsButton}>
-          <Text style={styles.settingsSubheading}>Enable Push Notifications</Text>
-          <Switch 
-            onValueChange={togglePushNotifications}
-            thumbColor={{ false: 'white', true: 'white'}}
-            trackColor={{ false: '#b6bab8', true: '#3eb6de'}}
-            value={pushNotificationsActive}
+          <Text style={styles.settingsHeading}>General</Text>
+          <SettingsButton 
+            onPress={() => setToggleCurrency(!toggleCurrency)}
+            title={'Currency'}
+            value={currency.toUpperCase()}
           />
-        </View>
-        <Separator />
+          <MenuOptions 
+            options={['USD', 'GBP', 'EUR']}
+            setAsyncValue={setCurrencyValue}
+            setValue={setCurrency}
+            setVisible={setToggleCurrency}
+            title={'Currency'}
+            value={currency}
+            visible={toggleCurrency}
+          />
 
-        <Text style={styles.settingsHeading}>About</Text>
-        <SettingsButton title={'Contact Us'} onPress={() => Linking.openURL('mailto: bitcloveruk@gmail.com')}/>
-        <View style={styles.separator} />
-        <SettingsButton title={'Privacy Policy'} onPress={() => navigation.navigate('Privacy')} />
-        <View style={styles.separator}/>
-        <SettingsButton title={'Terms of Use'} onPress={() => navigation.navigate('Terms')}/>
-        <View style={styles.separator}/>
-        <SettingsButton title={'Rate BitClover'}/>
-        <Text style={styles.versionText}> BitClover for Android v1.1.0</Text>
-      </View>
-    </ScrollView>
+          <Separator />
+          <SettingsButton 
+            onPress={() => setToggleDefaultScreen(!toggleDefaultScreen)}
+            title={'Default Screen'}
+            value={defaultScreen}
+          />
+
+          <MenuOptions 
+            options={['Home', 'Markets', 'Exchanges', 'News', 'Settings']}
+            setAsyncValue={setDefaultScreenValue}
+            setValue={setDefaultScreen}
+            setVisible={setToggleDefaultScreen}
+            title={'Default Screen'}
+            value={defaultScreen}
+            visible={toggleDefaultScreen}
+          />  
+
+          <Text style={styles.settingsHeading}>Notifications</Text>
+          <View style={styles.settingsButton}>
+            <Text style={styles.settingsSubheading}>Enable Push Notifications</Text>
+            <Switch 
+              onValueChange={togglePushNotifications}
+              thumbColor={{ false: 'white', true: 'white'}}
+              trackColor={{ false: '#b6bab8', true: '#3eb6de'}}
+              value={pushNotificationsActive}
+            />
+          </View>
+          <Separator />
+
+          <Text style={styles.settingsHeading}>About</Text>
+          <SettingsButton title={'Contact Us'} onPress={() => Linking.openURL('mailto: bitcloveruk@gmail.com')}/>
+          <View style={styles.separator} />
+          <SettingsButton title={'Privacy Policy'} onPress={() => navigation.navigate('Privacy')} />
+          <View style={styles.separator}/>
+          <SettingsButton title={'Terms of Use'} onPress={() => navigation.navigate('Terms')}/>
+          <View style={styles.separator}/>
+          <SettingsButton title={'Rate BitClover'} onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.pdob.bitclover&hl=en_GB&gl=US')}/>
+          <Text style={styles.versionText}> BitClover for Android v2.0</Text>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
@@ -245,13 +252,13 @@ const styles = StyleSheet.create({
   },  
   settingsContainer: {
     flex: 1,
-    backgroundColor: '#263238',
     padding: 10
   },
   settingsHeading: {
     color: 'white',
     fontFamily: 'serif',
     fontSize: 25,
+    fontStyle: 'italic',
     fontWeight: 'bold',
     marginTop: SIZE.height > 700 ? 15 : 0,
     paddingBottom: 10,

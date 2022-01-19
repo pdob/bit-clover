@@ -1,33 +1,32 @@
-import React, { 
-  useContext, 
-  useEffect, 
-  useState 
+import React, {
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
-import { 
+import {
   Dimensions,
-  FlatList, 
-  Image, 
+  FlatList,
+  Image,
   Pressable,
-  StyleSheet, 
-  Text, 
-  View 
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import numbro from 'numbro';
 import * as WebBrowser from 'expo-web-browser';
-import { SettingsContext } from '../contexts/SettingsContext';
+import {SettingsContext} from '../contexts/SettingsContext';
 import Separator from '../components/Separator';
 
 const endpoint = 'https://api.coingecko.com/api/v3/exchanges?per_page=50';
-const btcendpoint = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd%2Ceur%2Cgbp';
+const btcendpoint =
+  'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd%2Ceur%2Cgbp';
 const SIZE = Dimensions.get('window');
-
-
 
 const Exchanges = () => {
   const [data, setData] = useState([]);
   const [btcPrice, setBtcPrice] = useState({});
-  const { currency, currencySymbol } = useContext(SettingsContext);
-  
+  const {currency, currencySymbol} = useContext(SettingsContext);
+
   const getData = async () => {
     try {
       const response = await fetch(endpoint);
@@ -36,58 +35,59 @@ const Exchanges = () => {
       const btcJson = await btc.json();
       setData(json);
       setBtcPrice(btcJson.bitcoin);
-    }
-    catch (error) {
+    } catch (error) {
       alert(error);
-    } 
-  }
+    }
+  };
 
   useEffect(() => {
     getData();
   }, []);
 
-  const Item = ({ title, image, rank, volume, url, country }) => {
+  const Item = ({title, image, rank, volume, url, country}) => {
     return (
       <View style={styles.flatlistContainer}>
-        <Pressable 
+        <Pressable
           style={styles.flatlistItem}
-          onPress={() => WebBrowser.openBrowserAsync(url)}
-        >
+          onPress={() => WebBrowser.openBrowserAsync(url)}>
           <View style={styles.imageContainer}>
-            <Image 
+            <Image
               style={styles.image}
               source={{
-                uri: image
+                uri: image,
               }}
             />
 
-            <Text style={styles.statsText}>{rank}. {title}{'\n'}
+            <Text style={styles.statsText}>
+              {rank}. {title}
+              {'\n'}
               <Text style={styles.flatlistSubheading}>{country}</Text>
             </Text>
-            
           </View>
           <View style={styles.stats}>
             <Text style={styles.flatlistText}>
               24h volume: {'\n'}
               <Text style={styles.flatlistSubheading}>
-                BTC: {volume.toFixed(1)}{'\n'}
-                {currency}: {
-                  numbro(volume * btcPrice[currency.toLowerCase()]).formatCurrency({ 
-                    average: true, 
-                    mantissa: 2, 
-                    currencySymbol: currencySymbol
-                  })
-                }
+                BTC: {volume.toFixed(1)}
+                {'\n'}
+                {currency}:{' '}
+                {numbro(
+                  volume * btcPrice[currency.toLowerCase()],
+                ).formatCurrency({
+                  average: true,
+                  mantissa: 2,
+                  currencySymbol: currencySymbol,
+                })}
               </Text>
             </Text>
           </View>
         </Pressable>
       </View>
     );
-  }
+  };
 
-  const renderItem = ({ item }) => (
-    <Item 
+  const renderItem = ({item}) => (
+    <Item
       country={item.country}
       image={item.image}
       rank={item.trust_score_rank}
@@ -99,7 +99,7 @@ const Exchanges = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList 
+      <FlatList
         data={data}
         renderItem={renderItem}
         ItemSeparatorComponent={Separator}
@@ -119,41 +119,41 @@ const styles = StyleSheet.create({
   },
   flatlistItem: {
     alignItems: 'center',
-    height: 70, 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    marginRight: 10
+    height: 80,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginRight: 10,
   },
   flatlistText: {
     color: 'white',
     fontFamily: 'serif',
     fontSize: 14,
-    paddingLeft: 8
+    paddingLeft: 8,
   },
   flatlistSubheading: {
-    color: '#b6bab8', 
+    color: '#b6bab8',
     fontFamily: 'serif',
     fontSize: 13,
-    fontWeight: 'bold' 
+    fontWeight: 'bold',
   },
   image: {
     height: 25,
     width: 25,
-    marginRight: 5,
-    marginTop: 5
+    marginRight: 10,
+    marginTop: 5,
   },
   imageContainer: {
-    width: SIZE.width / 2, 
-    flexDirection: 'row'
+    width: SIZE.width / 2,
+    flexDirection: 'row',
   },
   stats: {
-    width: SIZE.width / 3.5
+    width: SIZE.width / 3.5,
   },
   statsText: {
     color: 'white',
     fontFamily: 'sans-serif',
-    fontSize: 18
-  }   
+    fontSize: 18,
+  },
 });
 
 export default Exchanges;
