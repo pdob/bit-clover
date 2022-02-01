@@ -20,7 +20,7 @@ const CoinFlatListItem = props => {
       <View style={styles.titleContainer}>
         <Text style={styles.rankText}>{props.rank}.</Text>
         <Image source={{uri: props.image}} style={styles.flatlistImage} />
-        <Text style={styles.flatlistTitle}>
+        <Text style={styles.flatlistTitle} numberOfLines={3}>
           {props.name}
           {'\n'}
           <Text style={styles.symbol}>{props.symbol.toUpperCase()}</Text>
@@ -38,21 +38,19 @@ const CoinFlatListItem = props => {
         <Text
           style={[
             styles.priceText,
-            // eslint-disable-next-line react-native/no-inline-styles
             {color: props.percentage > 0 ? 'green' : 'red'},
           ]}>
           {props.percentage > 0 && '+'}
-          {props.percentage.toFixed(2)}%
+          {props.percentage?.toFixed(2)}%
         </Text>
       </View>
       <View style={styles.priceContainer}>
         <Text
           style={[
             styles.priceText,
-            // eslint-disable-next-line react-native/no-inline-styles
             {color: props.percentage > 0 ? 'green' : 'red'},
           ]}>
-          {currencySymbol}{props.price.toFixed(2)}
+          {currencySymbol}{props.price.toFixed(props.price < 0.01 ? 4 : 2)}
         </Text>
       </View>
     </Pressable>
@@ -64,7 +62,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 65,
+    height: 75,
+    overflow: 'hidden',
   },
   flatlistImage: {
     height: 25,
@@ -76,6 +75,7 @@ const styles = StyleSheet.create({
     color: 'white',
     paddingLeft: 10,
     flex: 1,
+
   },
   percentageContainer: {
     width: '30%',
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '700',
   },
   rankText: {
     color: '#b6bab8',
@@ -110,8 +110,8 @@ const styles = StyleSheet.create({
   },
   symbol: {
     color: '#b6bab8',
-    fontWeight: 'bold',
-    fontSize: 12,
+    fontWeight: '700',
+    fontSize: 13,
   },
   titleContainer: {
     flexDirection: 'row',

@@ -1,12 +1,10 @@
 import React, { useState, useEffect, createContext } from 'react';
-import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const SettingsContext = createContext();
 
 const SettingsContextProvider = (props) => {
 
-  const SIZE = Dimensions.get('window');
   const [currency, setCurrency] = useState('USD');
   const [pushNotificationsActive, setPushNotificationsActive] = useState(false);
   const [defaultScreen, setDefaultScreen] = useState('Home');
@@ -25,7 +23,7 @@ const SettingsContextProvider = (props) => {
 
   const getCurrency = async () => {
     await AsyncStorage.getItem('currency').then((value) => {
-      if(value !== null) {
+      if(value) {
         setCurrency(value);
       }
     })
@@ -44,7 +42,7 @@ const SettingsContextProvider = (props) => {
     try {
       await AsyncStorage.getItem('defaultScreen')
       .then((value) => {
-        if(value !== null) {
+        if(value) {
           setDefaultScreen(value);
         }
       })
@@ -77,14 +75,11 @@ const SettingsContextProvider = (props) => {
     }
   }
 
-
- 
-  
   useEffect(() => {   
     getCurrency();
     getPushNotificationsActive();
     getDefaultScreen();
-  }, [])
+  }, [currency])
   
   return (
     <SettingsContext.Provider
@@ -99,7 +94,6 @@ const SettingsContextProvider = (props) => {
         setDefaultScreen,
         setDefaultScreenValue,
         currencySymbol,
-        SIZE,
       }}
     >
       {props.children}

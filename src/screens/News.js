@@ -9,15 +9,18 @@ import {
   View,
 } from 'react-native';
 import Separator from '../components/Separator';
+import Loading from '../components/Loading';
 import * as WebBrowser from 'expo-web-browser';
 import moment from 'moment';
 
-const API_KEY = 'Insert Your own free NewsAPI key';
+const API_KEY = 'Enter your own free NewsAPI key';
 const endpoint = `https://newsapi.org/v2/everything?q=crypto&language=en&apiKey=${API_KEY}`;
 const SIZE = Dimensions.get('window');
 
 const News = () => {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const getData = async () => {
     try {
       const response = await fetch(endpoint);
@@ -29,6 +32,8 @@ const News = () => {
       );
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,12 +71,14 @@ const News = () => {
       <View style={styles.headingContainer}>
         <Text style={styles.heading}>News</Text>
       </View>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={item => item.title + Math.random().toString()}
-        ItemSeparatorComponent={Separator}
-      />
+      {loading ? <Loading /> : (
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={item => item.title + Math.random().toString()}
+          ItemSeparatorComponent={Separator}
+        />
+      )}
     </View>
   );
 };

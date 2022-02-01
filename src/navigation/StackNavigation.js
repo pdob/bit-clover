@@ -32,8 +32,6 @@ const StackNavigation = () => {
       }}/>
 		</Stack.Navigator>
 	);
-
-
 };
 
 export default StackNavigation;

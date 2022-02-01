@@ -16,6 +16,7 @@ import numbro from 'numbro';
 import * as WebBrowser from 'expo-web-browser';
 import {SettingsContext} from '../contexts/SettingsContext';
 import Separator from '../components/Separator';
+import Loading from '../components/Loading';
 
 const endpoint = 'https://api.coingecko.com/api/v3/exchanges?per_page=50';
 const btcendpoint =
@@ -25,6 +26,7 @@ const SIZE = Dimensions.get('window');
 const Exchanges = () => {
   const [data, setData] = useState([]);
   const [btcPrice, setBtcPrice] = useState({});
+  const [loading, setLoading] = useState(true);
   const {currency, currencySymbol} = useContext(SettingsContext);
 
   const getData = async () => {
@@ -37,6 +39,8 @@ const Exchanges = () => {
       setBtcPrice(btcJson.bitcoin);
     } catch (error) {
       alert(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,7 +72,7 @@ const Exchanges = () => {
             <Text style={styles.flatlistText}>
               24h volume: {'\n'}
               <Text style={styles.flatlistSubheading}>
-                BTC: {volume.toFixed(1)}
+                BTC: {volume.toFixed(2)}
                 {'\n'}
                 {currency}:{' '}
                 {numbro(
@@ -99,11 +103,13 @@ const Exchanges = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        ItemSeparatorComponent={Separator}
-      />
+      {loading ? <Loading /> : (
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          ItemSeparatorComponent={Separator}
+        />
+      )}
     </View>
   );
 };
@@ -133,8 +139,8 @@ const styles = StyleSheet.create({
   flatlistSubheading: {
     color: '#b6bab8',
     fontFamily: 'serif',
-    fontSize: 13,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '700',
   },
   image: {
     height: 25,
@@ -147,7 +153,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   stats: {
-    width: SIZE.width / 3.5,
+    width: SIZE.width / 3.2,
   },
   statsText: {
     color: 'white',

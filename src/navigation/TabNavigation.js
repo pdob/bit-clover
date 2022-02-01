@@ -4,13 +4,13 @@ import Markets from '../screens/Markets';
 import Exchanges from '../screens/Exchanges';
 import Settings from '../screens/Settings';
 import News from '../screens/News';
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import TabBarIcon from '../components/TabBarIcon';
 import icons from '../constants/icons';
 import {useContext} from 'react';
 import {SettingsContext} from '../contexts/SettingsContext';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-const Tab = createMaterialTopTabNavigator();
+const Tab = createBottomTabNavigator();
 
 const TabNavigation = () => {
   const {defaultScreen} = useContext(SettingsContext);
@@ -22,11 +22,13 @@ const TabNavigation = () => {
         tabBarStyle: {
           backgroundColor: '#000000',
           height: 50,
+          borderTopWidth: 0
         },
         tabBarLabelStyle: {
-          fontSize: 7,
+          fontSize: 11,
           fontFamily: 'notoserif',
           fontWeight: 'bold',
+          paddingBottom: 3
         },
         tabBarContentContainerStyle: {
           alignItems: 'center',
@@ -36,8 +38,8 @@ const TabNavigation = () => {
         tabBarIndicatorStyle: {
           backgroundColor: 'transparent',
         },
-      }}
-      tabBarPosition="bottom">
+        headerShown: false
+      }}>
       <Tab.Screen
         name="Home"
         component={Home}

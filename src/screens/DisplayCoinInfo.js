@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useCallback, useContext} from 'react';
 import {
+  Dimensions,
   View,
   Text,
   Pressable,
@@ -27,6 +28,8 @@ const DisplayCoinInfo = ({route}) => {
   const labels = [1, 7, 30, 60, 365, 'max'];
   const controller = new AbortController();
   const {currency, currencySymbol} = useContext(SettingsContext);
+  const SIZE = Dimensions.get('window');
+
 
   const getData = async () => {
     Promise.all([
@@ -70,7 +73,7 @@ const DisplayCoinInfo = ({route}) => {
 
   const DisplayChart = () => {
     return (
-      <LineChart.Provider data={chartDataToShow} style={styles.chartContainer}>
+      <LineChart.Provider data={chartDataToShow}>
         <View style={styles.chartLabelContainer}>
           <LineChart.PriceText
             style={styles.chartPrice}
@@ -93,10 +96,11 @@ const DisplayCoinInfo = ({route}) => {
           />
           <LineChart.DatetimeText style={styles.chartDateTime} />
         </View>
-        <LineChart>
+        <LineChart width={SIZE.width - 20}>
           <LineChart.Path
-            color={coinInfo.price_change_24h > 0 ? 'green' : 'red'}>
-            <LineChart.Gradient />
+            color={coinInfo.price_change_24h > 0 ? 'green' : 'red'}
+            width={2}>
+            <LineChart.Gradient color="green"/>
           </LineChart.Path>
           <LineChart.CursorLine />
         </LineChart>
@@ -158,11 +162,10 @@ const DisplayCoinInfo = ({route}) => {
 
   const CoinInformation = useCallback(
     () => (
-      <View>
+      <View style={styles.coinInfoContainer}>
         <View style={styles.statTitle}>
           <Text style={styles.coinStatTitle}>About {name}</Text>
         </View>
-        <View style={styles.separator} />
         <View style={styles.statContainer}>
           <CoinStat
             title="Market rank"
@@ -223,9 +226,10 @@ const DisplayCoinInfo = ({route}) => {
                 }
                 percentageChange={coinInfo.price_change_percentage_24h}
               />
-              <DisplayChart />
-              <ChartDateOptions />
-              <View style={styles.separator} />
+              <View style={styles.chartContainer}>
+                <DisplayChart />
+                <ChartDateOptions />
+              </View>
               <CoinInformation />
             </View>
           )}
@@ -238,7 +242,7 @@ const DisplayCoinInfo = ({route}) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'black',
+    backgroundColor: '#102027',
     flex: 1,
   },
   buttonContainer: {
@@ -250,8 +254,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   chartContainer: {
-    paddingLeft: 10,
-    paddingRight: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: 'black',
+    borderRadius: 10,
   },
   chartLabelContainer: {
     justifyContent: 'center',
@@ -270,6 +276,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     paddingBottom: 5,
+  },
+  coinInfoContainer: {
+    backgroundColor: '#102027',
+    paddingBottom: 10,
   },
   coinStat: {
     flexDirection: 'row',
@@ -302,8 +312,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   statContainer: {
+    borderRadius: 10,
     paddingLeft: 10,
     paddingRight: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: 'black',
   },
   statTitle: {
     backgroundColor: '#102027',

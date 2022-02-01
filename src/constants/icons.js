@@ -10,6 +10,7 @@ const icons = {
   news: require('../assets/icons/news-icon.png'),
   marketCap: require('../assets/icons/market-cap.png'),
   marketRank: require('../assets/icons/market-rank.png'),
+  search: require('../assets/icons/search.png'),
   totalSupply: require('../assets/icons/total-supply.png'),
 }
 

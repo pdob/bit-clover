@@ -37,7 +37,7 @@
       "googleServicesFile": "./src/google-services.json",
       "useNextNotificationsApi": true,
       "icon": "./src/assets/notification-icon.png",
-      "versionCode": 2
+      "versionCode": 7
     },
     "notification": {
       "icon": "./src/assets/notification-icon.png",

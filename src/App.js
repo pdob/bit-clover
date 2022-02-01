@@ -32,7 +32,7 @@ export default function App() {
     async function prepare() {
       try {
         await SplashScreen.preventAutoHideAsync();
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise(resolve => setTimeout(resolve, 2000));
       } catch (e) {
         console.warn(e);
       } finally {
@@ -60,14 +60,14 @@ export default function App() {
 
 
   return (
-    <SafeAreaView style={{flex: 1}} onLayout={onLayoutRootView} >
-      <StatusBar />
-      <SettingsContextProvider>
+    <SettingsContextProvider>
+      <SafeAreaView style={{flex: 1}} onLayout={onLayoutRootView} >
+        <StatusBar />
         <NavigationContainer >
           <StackNavigation />
         </NavigationContainer>
-      </SettingsContextProvider>
-    </SafeAreaView>
+      </SafeAreaView>
+    </SettingsContextProvider>
   );
 }
 

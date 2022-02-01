@@ -9,7 +9,7 @@ import {
   SafeAreaView,
   View,
   Text,
-  TextInput,
+  Image,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -18,9 +18,9 @@ import {
 import CoinFlatListItem from '../components/CoinFlatlistItem';
 import Error from '../components/Error';
 import Loading from '../components/Loading';
+import MySearchBar from '../components/MySearchBar';
 import {makeRequest} from '../api';
 import {SettingsContext} from '../contexts/SettingsContext';
-import {SearchBar} from 'react-native-elements';
 
 const Markets = () => {
   const [pageNumber, setPageNumber] = useState(1);
@@ -53,6 +53,7 @@ const Markets = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('Market High');
   const [error, setError] = useState(null);
+  const [searchVisible, setSearchVisible] = useState(false);
   const listRef = useRef(null);
   const {currency} = useContext(SettingsContext);
 
@@ -70,13 +71,13 @@ const Markets = () => {
     } catch (error) {
       setError(true);
     } finally {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 500);
     }
   };
 
   useEffect(() => {
     getData();
-  }, [refreshing, pageNumber]);
+  }, [refreshing, pageNumber, currency]);
 
   const searchFilter = text => {
     const newData = data.filter(item => {
@@ -85,31 +86,29 @@ const Markets = () => {
       const textData = text.toLowerCase();
       return (
         itemData.indexOf(textData) >= 0 || symbolData.indexOf(textData) >= 0
-      );
-    });
-    setData(newData);
-    setSearchTerm(text);
+        );
+      });
+      setSearchTerm(text);
+      setData(newData);
 
     if (!text) {
       setData(initialData);
-      setSearchTerm(text);
     }
   };
 
-  const renderItem = useCallback(
-    ({item}) => (
-      <CoinFlatListItem
-        id={item.id}
-        image={item.image}
-        name={item.name}
-        price={item.current_price}
-        rank={item.market_cap_rank}
-        percentage={item.price_change_percentage_24h}
-        symbol={item.symbol}
-      />
-    ),
-    [],
-  );
+  const renderItem = ({item}) => {
+    return (
+    <CoinFlatListItem
+      id={item.id}
+      image={item.image}
+      name={item.name}
+      price={item.current_price}
+      rank={item.market_cap_rank}
+      percentage={item.price_change_percentage_24h}
+      symbol={item.symbol}
+    />
+  )};
+    
 
   const PageButton = ({pageNo}) => {
     return (
@@ -133,6 +132,12 @@ const Markets = () => {
 
   const Header = () => (
     <View style={styles.header}>
+      <Pressable style={styles.headerSearch} onPress={() => setSearchVisible(!searchVisible)}>
+        <Image 
+          source={require('../assets/icons/search.png')}
+          style={{height: 22.5, width: 22.5}}
+        />
+      </Pressable>
       <Pressable
         style={styles.headerName}
         onPress={() => {
@@ -172,7 +177,7 @@ const Markets = () => {
 
   const Footer = () => {
     const myPages = [];
-    for (let i = 1; i < 6; i++) {
+    for (let i = 1; i < 7; i++) {
       myPages.push(<PageButton key={i} pageNo={i} />);
     }
     return <View style={styles.footer}>{myPages}</View>;
@@ -192,48 +197,47 @@ const Markets = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    wait(2000).then(() => setRefreshing(false));
+    wait(1000).then(() => setRefreshing(false));
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      {loading && !error ? (
-        <Loading />
-      ) : (
-        <View style={styles.container}>
-          {!error && !loading && (
-            <View style={styles.flex1}>
-              <SearchBar
-                onChangeText={searchFilter}
-                placeholder="Search coins"
-                placeholderTextColor="white"
-                value={searchTerm}
-                containerStyle={styles.inputContainer}
+      <View style={styles.container}>
+        {loading ? <Loading /> : (
+        <View style={styles.flex1}>
+          <MySearchBar
+            onChangeText={text => searchFilter(text)}
+            visible={searchVisible}
+            onRequestClose={() => setSearchVisible(!searchVisible)}
+            value={searchTerm}
+            setVisible={() => setSearchVisible(false)}
+          />
+          <FlatList
+            extraData={searchTerm}
+            contentContainerStyle={{flexGrow: 1}}
+            ref={listRef}
+            data={data}
+            renderItem={renderItem}
+            getItemLayout={(data, index) => ({length: 75, offset: 75 * index, index})}
+            keyExtractor={item => item.id}
+            keyboardShouldPersistTaps='always'
+            removeClippedSubviews
+            ItemSeparatorComponent={Separator}
+            ListHeaderComponent={Header}
+            ListFooterComponent={Footer}
+            ListFooterComponentStyle={{marginTop: 'auto'}}
+            ListEmptyComponent={Empty}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
               />
-              <FlatList
-                extraData={searchTerm}
-                contentContainerStyle={{flexGrow: 1}}
-                ref={listRef}
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-                ItemSeparatorComponent={Separator}
-                ListHeaderComponent={Header}
-                ListFooterComponent={Footer}
-                ListFooterComponentStyle={{marginTop: 'auto'}}
-                ListEmptyComponent={Empty}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
-                }
-              />
-            </View>
-          )}
-          {error && <Error />}
+            }
+          />
         </View>
-      )}
+        )}
+        {error && <Error />}
+        </View>
     </SafeAreaView>
   );
 };
@@ -253,7 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    height: 40,
+    height: 50,
     backgroundColor: '#102027',
     flexDirection: 'row',
     alignItems: 'center',
@@ -263,7 +267,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerName: {
-    width: '40%',
+    width: '30%',
     alignItems: 'center',
     paddingLeft: 7,
   },
@@ -271,6 +275,12 @@ const styles = StyleSheet.create({
     width: '30%',
     alignItems: 'center',
   },
+  headerSearch: {
+    width: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 50,
+  },  
   headerText: {
     color: '#b6bab8',
     fontSize: 15,
@@ -292,9 +302,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   separator: {
-    height: 0.6,
+    height: 0.5,
     width: '100%',
-    backgroundColor: 'grey',
+    backgroundColor: '#102027',
   },
   inputContainer: {
     backgroundColor: '#102027',

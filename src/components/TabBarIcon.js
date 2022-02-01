@@ -3,7 +3,7 @@ import { View, Image } from 'react-native';
 
 
 const TabBarIcon = ({ focused, iconSrc }) => (
-  <View style={{marginTop: 5}}>
+  <View>
     <Image 
       source={iconSrc}
       resizeMode='contain'
@@ -11,7 +11,8 @@ const TabBarIcon = ({ focused, iconSrc }) => (
         height: 22.5,
         width: 22.5,
         alignSelf: 'center',
-        tintColor: focused ? 'white' : '#62727b'
+        tintColor: focused ? 'white' : '#62727b',
+        marginTop: 5
       }}
     />  
   </View>

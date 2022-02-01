@@ -1,5 +1,3 @@
-import Config from "react-native-config";
-
 const API_URL = 'https://api.coingecko.com/api/v3/coins';
 
 export const makeRequest = (params) => {
