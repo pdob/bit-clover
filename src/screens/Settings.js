@@ -21,6 +21,7 @@ import { useNavigation } from '@react-navigation/core';
 import * as Notifications from 'expo-notifications';
 import { LinearGradient } from 'expo-linear-gradient';
 import { makeRequest } from '../api';
+import { store, changeDefaultScreen, changeCurrency, pushNotificationsActive } from '../store/store'
 
 const SIZE = Dimensions.get('window');
 
