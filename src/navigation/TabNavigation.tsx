@@ -13,7 +13,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 const Tab = createBottomTabNavigator();
 
 const TabNavigation = () => {
-  const {defaultScreen} = useContext(SettingsContext);
+  const { defaultScreen } = useContext(SettingsContext);
 
   return (
     <Tab.Navigator
@@ -30,20 +30,13 @@ const TabNavigation = () => {
           fontWeight: 'bold',
           paddingBottom: 3
         },
-        tabBarContentContainerStyle: {
-          alignItems: 'center',
-        },
         tabBarActiveTintColor: 'white',
         tabBarInactiveTintColor: '#62727b',
-        tabBarIndicatorStyle: {
-          backgroundColor: 'transparent',
-        },
         headerShown: false
       }}>
       <Tab.Screen
         name="Home"
         component={Home}
-        path="Home"
         options={{
           tabBarIcon: ({focused}) => 
             <TabBarIcon iconSrc={icons.home} focused={focused} />,
@@ -52,7 +45,6 @@ const TabNavigation = () => {
       <Tab.Screen
         name="Markets"
         component={Markets}
-        path="Markets"
         options={{
           tabBarIcon: ({focused}) => 
             <TabBarIcon iconSrc={icons.markets} focused={focused} />,

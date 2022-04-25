@@ -38,18 +38,14 @@ const SettingsContextProvider = (props) => {
     }
   }
 
-  const getDefaultScreen =  async (value) => {
-    try {
-      await AsyncStorage.getItem('defaultScreen')
-      .then((value) => {
-        if(value) {
-          setDefaultScreen(value);
-        }
-      })
-    }
-    catch(e) {
-      console.warn(e);
-    }
+  const getDefaultScreen =  async () => {
+
+    await AsyncStorage.getItem('defaultScreen')
+    .then((value) => {
+      if(value) {
+        setDefaultScreen(value);
+      }
+    })
   }
 
  

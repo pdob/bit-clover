@@ -115,6 +115,8 @@ const Settings = () => {
   
   {/** Component which maps buttons for selecting options */}
 
+  console.log(store.getState())
+
 
   const MenuOptions = ({ value, title, setValue, visible, setVisible, options, setAsyncValue }) => {
 
@@ -137,6 +139,7 @@ const Settings = () => {
                   setAsyncValue(item)
                   setValue(item)
                   setVisible(false)
+                  store.dispatch(changeCurrency(item))
                 }}
               >
                 <View style={[styles.settingsModalOptions, {backgroundColor: item === value ? 'grey' : '#263238'}]}>
@@ -233,8 +236,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: 'white', 
-    fontSize: 15, 
-    fontFamily: 'serif', 
+    fontSize: 15,
     textAlign: 'center'
   },
   separator: {
@@ -257,7 +259,6 @@ const styles = StyleSheet.create({
   },
   settingsHeading: {
     color: 'white',
-    fontFamily: 'serif',
     fontSize: 25,
     fontStyle: 'italic',
     fontWeight: 'bold',
@@ -304,13 +305,11 @@ const styles = StyleSheet.create({
   },  
   settingsValue: {
     color: '#b6bab8',
-    fontFamily: 'serif',
     fontSize: 15,
     paddingRight: 10
   },
   settingsSubheading: {
     color: 'white',
-    fontFamily: 'serif',
     fontSize: 15,
     paddingLeft: 10,
     paddingRight: 10

@@ -71,6 +71,8 @@ const DisplayCoinInfo = ({route}) => {
     };
   });
 
+  console.log(chartDataToShow)
+
   const DisplayChart = () => {
     return (
       <LineChart.Provider data={chartDataToShow}>
@@ -198,7 +200,7 @@ const DisplayCoinInfo = ({route}) => {
           />
           <CoinStat
             title="ATH date"
-            value={formatDate(coinInfo.ath_date.aud)}
+            value={formatDate(coinInfo.ath_date[currency.toLowerCase()])}
             icon={icons.athDate}
           />
         </View>
@@ -227,7 +229,7 @@ const DisplayCoinInfo = ({route}) => {
                 percentageChange={coinInfo.price_change_percentage_24h}
               />
               <View style={styles.chartContainer}>
-                <DisplayChart />
+                {/* <DisplayChart /> */}
                 <ChartDateOptions />
               </View>
               <CoinInformation />
